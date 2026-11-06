@@ -751,6 +751,10 @@ body{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
 .desktop .scrollbox{flex:1 1 auto;height:auto;min-height:0}
 /* owner vs visitor view */
 body.visitor .owner-only{display:none!important}
+/* deadlines are view-only for visitors */
+body.visitor .edit-only,body.visitor #list .icon[data-act],body.visitor #list .empty .btn{display:none!important}
+.view-note{display:none;font-size:12px;font-weight:700;color:var(--dpink);background:var(--lpink);border:1.5px solid var(--line);border-radius:999px;padding:3px 10px}
+body.visitor .view-note{display:inline-block}
 .visitor-only{display:none}
 body.visitor .visitor-only{display:inline}
 .write-only{display:none!important}
@@ -859,11 +863,11 @@ body.visitor .desktop .w-grid{grid-template-columns:minmax(0,1fr)}
   <nav class="navbar icon-nav" aria-label="Apps">
     <button class="nav-ico" data-app="home"><span class="ni" data-px="home"></span><span class="nl">Home</span></button>
     <button class="nav-ico" data-app="about"><span class="ni" data-px="about"></span><span class="nl">About</span></button>
-    <button class="nav-ico owner-only" data-app="links"><span class="ni" data-px="links"></span><span class="nl">Quick Links</span></button>
-    <button class="nav-ico owner-only" data-app="deadlines"><span class="ni" data-px="deadlines"></span><span class="nl">Deadlines</span></button>
-    <button class="nav-ico owner-only" data-app="notes"><span class="ni" data-px="notes"></span><span class="nl">Notes</span></button>
+    <button class="nav-ico" data-app="links"><span class="ni" data-px="links"></span><span class="nl">Quick Links</span></button>
+    <button class="nav-ico" data-app="deadlines"><span class="ni" data-px="deadlines"></span><span class="nl">Deadlines</span></button>
+    <button class="nav-ico" data-app="notes"><span class="ni" data-px="notes"></span><span class="nl">Notes</span></button>
     <button class="nav-ico" data-app="books"><span class="ni" data-px="books"></span><span class="nl">Books</span></button>
-    <button class="nav-ico owner-only" id="bSettings" data-app="settings" title="Settings"><span class="ni" data-px="settings"></span><span class="nl">Settings</span></button>
+    <button class="nav-ico" id="bSettings" data-app="settings" title="Settings"><span class="ni" data-px="settings"></span><span class="nl">Settings</span></button>
     <span class="nav-shine" aria-hidden="true"></span>
   </nav>
 
@@ -1000,7 +1004,7 @@ body.visitor .desktop .w-grid{grid-template-columns:minmax(0,1fr)}
             <div class="big-date" id="bigDate"></div>
             <small>Manila · Philippine Standard Time</small>
           </div>
-          <div class="w-card owner-only">
+          <div class="w-card">
             <h4 class="w-h">✦ how are you feeling? ✦</h4>
             <div class="moods" id="moods"></div>
           </div>
@@ -1013,15 +1017,15 @@ body.visitor .desktop .w-grid{grid-template-columns:minmax(0,1fr)}
         <div class="stars" aria-hidden="true"></div>
         <div class="w-grid">
           <div class="w-card bday" id="bdayCard"></div>
-          <div class="w-card owner-only" id="dueSoon"></div>
+          <div class="w-card" id="dueSoon"></div>
         </div>
       </div>
     </section>
 
     <!-- RIGHT -->
     <aside class="side side-right">
-      <h2 class="side-h owner-only">Updates</h2>
-      <div class="updates w98 owner-only" id="updates"></div>
+      <h2 class="side-h">Updates</h2>
+      <div class="updates w98" id="updates"></div>
       <h2 class="side-h">Music</h2>
       <div class="player" id="player">
       <div class="pl-bar"><span>♪ now playing</span><span class="pl-win"><i>_</i><i>□</i><i>x</i></span></div>
@@ -1038,8 +1042,8 @@ body.visitor .desktop .w-grid{grid-template-columns:minmax(0,1fr)}
         <label class="pl-vol" title="Volume"><span aria-hidden="true">♪</span><input type="range" id="plVol" min="0" max="100" value="45" aria-label="Volume"></label>
       </div>
     </div>
-      <div class="poster owner-only" id="dueNext"></div>
-      <div class="b88 badge88 owner-only" aria-hidden="true"><span class="b88-bar"><i>_</i><i>□</i><i>x</i></span><span class="b88-t">SYNCED W/ SHEETS</span></div>
+      <div class="poster" id="dueNext"></div>
+      <div class="b88 badge88" aria-hidden="true"><span class="b88-bar"><i>_</i><i>□</i><i>x</i></span><span class="b88-t">SYNCED W/ SHEETS</span></div>
     </aside>
   </div>
 </main>
@@ -1087,8 +1091,9 @@ body.visitor .desktop .w-grid{grid-template-columns:minmax(0,1fr)}
       <div class="pill-h">Deadlines</div>
       <div class="stars" aria-hidden="true"></div>
       <div class="toolbar">
-        <button class="btn sm" id="bAdd" title="Add a deadline">+ Add deadline</button>
-        <button class="btn soft sm" id="bGen" title="Generate dates">Generate dates</button>
+        <button class="btn sm edit-only" id="bAdd" title="Add a deadline">+ Add deadline</button>
+        <button class="btn soft sm edit-only" id="bGen" title="Generate dates">Generate dates</button>
+        <span class="view-note">👀 view only</span>
         <button class="btn soft sm" data-go="closed" title="Show done / renewed / lapsed">Closed</button>
         <button class="btn soft sm" data-go="export" title="Export CSV">Export CSV</button>
         <span class="sync" id="sync">Saved on this device</span>
@@ -1158,10 +1163,9 @@ body.visitor .desktop .w-grid{grid-template-columns:minmax(0,1fr)}
         <div class="lib-top">
           <button class="btn sm write-only" id="bkPub" title="Upload to GitHub so everyone can read it">⬆ Add to shared shelf</button>
           <input type="file" id="bkPubFile" accept=".epub,application/epub+zip" multiple hidden>
-          <button class="btn soft sm owner-only" id="bkAdd" title="Only on this device">+ Add private EPUB</button>
+          <button class="btn soft sm" id="bkAdd" title="Only on this device">+ Add private EPUB</button>
           <input type="file" id="bkFile" accept=".epub,application/epub+zip" multiple hidden>
-          <span class="page-note owner-only">or drag &amp; drop .epub files here ♡</span>
-          <span class="page-note visitor-only">Rhoda's bookshelf ♡ pick a book to read</span>
+          <span class="page-note">or drag &amp; drop .epub files here ♡</span>
         </div>
         <div class="shelf-head" id="shelfHead" hidden></div>
         <div class="shelf" id="shelf"></div>
@@ -1203,11 +1207,11 @@ body.visitor .desktop .w-grid{grid-template-columns:minmax(0,1fr)}
   </div>
   <div class="sm-list">
     <button data-app="about"><i data-px="about"></i>About Me</button>
-    <button class="owner-only" data-app="links"><i data-px="links"></i>Quick Links</button>
-    <button class="owner-only" data-app="deadlines"><i data-px="deadlines"></i>Deadlines</button>
-    <button class="owner-only" data-app="notes"><i data-px="notes"></i>Notes</button>
+    <button data-app="links"><i data-px="links"></i>Quick Links</button>
+    <button data-app="deadlines"><i data-px="deadlines"></i>Deadlines</button>
+    <button data-app="notes"><i data-px="notes"></i>Notes</button>
     <button data-app="books"><i data-px="books"></i>Books</button>
-    <button class="owner-only" data-app="settings"><i data-px="settings"></i>Settings</button>
+    <button data-app="settings"><i data-px="settings"></i>Settings</button>
   </div>
   <div class="sm-foot"><button data-app="home"><i data-px="home"></i>Home screen</button></div>
 </div>
@@ -1282,6 +1286,10 @@ body.visitor .desktop .w-grid{grid-template-columns:minmax(0,1fr)}
       <input id="s_api" placeholder="https://script.google.com/macros/s/…/exec">
       <span class="hint">Paste the web app URL from Code.gs to save to Google Sheets and turn on email reminders. Leave blank to save on this device only.</span>
     </label>
+    <label class="f full">Edit password
+      <input id="s_key" type="password" autocomplete="off" placeholder="the EDIT_KEY you set in Code.gs">
+      <span class="hint">Only you need this. Everyone can view the deadlines, but changes are saved to the Sheet only with this password. It stays in this browser.</span>
+    </label>
     <div class="full" style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn soft sm" id="bTest">Test connection</button>
       <button class="btn soft sm" id="bExport">Export CSV</button>
@@ -1306,7 +1314,7 @@ const TYPES = ['Contract end','Contract renewal','Probationary evaluation','30-d
 const ENTITIES = ['RDR BSI','RDR Global','Hope'];
 const OWNERS = ['Rhoda','Princess','Andiolyn','HR'];
 const FIELDS = ['id','title','type','entity','party','owner','startDate','dueDate','remindDays','status','docRef','link','notes','createdAt','updatedAt'];
-const LS_ITEMS = 'rdr_deadlines_items', LS_API = 'rdr_deadlines_api';
+const LS_ITEMS = 'rdr_deadlines_items', LS_API = 'rdr_deadlines_api', LS_KEY = 'rdr_deadlines_editkey';
 
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -1372,10 +1380,10 @@ async function push(action,payload){
   if(!API) return;
   setSync('syncing');
   try{
-    const r=await fetch(API,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action},payload))});
+    const r=await fetch(API,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action},payload,{key:lsGet(LS_KEY,'')}))});
     const j=await r.json(); if(!j.ok) throw new Error(j.error||'Save failed');
     setSync('ok');
-  }catch(e){setSync('error',e.message);toast('Saved on this device, but Google Sheets sync failed')}
+  }catch(e){setSync('error',e.message);toast(/password|locked/i.test(e.message)?'Not saved to Google Sheets: '+e.message+' (check Settings › Edit password)':'Saved on this device, but Google Sheets sync failed')}
 }
 function upsert(list){
   const now=new Date().toISOString();
@@ -1572,8 +1580,8 @@ $('#mGen').addEventListener('input',genPreview); $('#mGen').addEventListener('ch
 $('#bGenSave').onclick=()=>{const g=genItems(); if(!g.length){toast('Fill in the required fields');return} upsert(g); refreshOwners(); closeAll(); toast(g.length+' deadline'+(g.length>1?'s':'')+' added')};
 
 /* ===== settings ===== */
-$('#bSettings').onclick=()=>{$('#s_api').value=API;open('#mSet')};
-$('#bSetSave').onclick=()=>{API=$('#s_api').value.trim(); lsSet(LS_API,API); closeAll(); load()};
+$('#bSettings').onclick=()=>{$('#s_api').value=API;$('#s_key').value=lsGet(LS_KEY,'');open('#mSet')};
+$('#bSetSave').onclick=()=>{API=$('#s_api').value.trim(); lsSet(LS_API,API); lsSet(LS_KEY,$('#s_key').value.trim()); closeAll(); load()};
 $('#bTest').onclick=async()=>{
   const u=$('#s_api').value.trim(); if(!u){toast('Paste the web app URL first');return}
   try{const r=await fetch(u,{redirect:'follow'});const j=await r.json(); toast(j.ok?'Connected: '+j.items.length+' item(s) in the Sheet':'Error: '+j.error)}
@@ -1676,7 +1684,7 @@ const LS_MOOD='rhoda_dash_mood';
    Add ?visitor to the link to preview what visitors see. */
 const Owner=(()=>{
   const KEY='rhoda_gh_token';
-  const REPO='';            // optional, e.g. 'your-username/rhoda-dashboard' (found automatically on GitHub Pages)
+  const REPO='rhodardr-ui/my-dashboard';   // the GitHub repository that stores the shared books (works on GitHub Pages, Vercel, or locally)
   function repo(){
     if(REPO) return REPO;
     const h=location.hostname; if(!/\.github\.io$/i.test(h)) return '';
@@ -1785,7 +1793,7 @@ const WM=(()=>{
     if(id==='notes') Notes.open();
     if(id==='books') Reader.show();
   }
-  const OWNER_APPS=['links','deadlines','notes','settings'];
+  const OWNER_APPS=[];                                   // apps only the owner may open (none: everything is public)
   function open(id){
     if(OWNER_APPS.includes(id)&&!Owner.isOwner()){ toast("That one's just for Rhoda ♡"); return }
     if(id==='settings'){ $('#bSettings').onclick(); return }
@@ -2371,7 +2379,7 @@ a{color:#D9578A}
   const lib=$('#libView');
   lib.addEventListener('dragover',e=>{e.preventDefault(); lib.classList.add('drag')});
   lib.addEventListener('dragleave',e=>{if(!lib.contains(e.relatedTarget)) lib.classList.remove('drag')});
-  lib.addEventListener('drop',e=>{e.preventDefault(); lib.classList.remove('drag'); if(!Owner.isOwner()) return;
+  lib.addEventListener('drop',e=>{e.preventDefault(); lib.classList.remove('drag');
     const fs=[...e.dataTransfer.files].filter(f=>/\.epub$/i.test(f.name)); fs.length?importFiles(fs):toast('Drop .epub files only ♡')});
   $('#bkPub').onclick=()=>$('#bkPubFile').click();
   $('#bkPubFile').onchange=e=>{const fs=[...e.target.files]; e.target.value=''; if(fs.length) uploadShared(fs)};
@@ -2436,6 +2444,13 @@ a{color:#D9578A}
   $('#rdTheme').value=prefs.theme; $('#rdTheme').onchange=e=>setPref('theme',e.target.value);
   $('#rdFull').onclick=()=>{$('#readView').classList.toggle('full'); setTimeout(relayout,30)};
   document.addEventListener('keydown',onKey);
+  // keep the shared shelf fresh on every device: check GitHub every 2 minutes and whenever you come back to the tab
+  let lastSync=Date.now();
+  const resync=()=>{
+    if(document.hidden||Date.now()-lastSync<20000) return; lastSync=Date.now();
+    synced=false; syncPublic().then(()=>{if(!$('#win-books').hidden&&$('#readView').hidden) renderShelf()});
+  };
+  setInterval(resync,120000); document.addEventListener('visibilitychange',resync);
   let rT; const later=()=>{clearTimeout(rT); rT=setTimeout(relayout,150)};
   addEventListener('resize',later);
   if(window.ResizeObserver) new ResizeObserver(later).observe($('#win-books .win-body'));
@@ -2488,7 +2503,8 @@ function renderSide(){
 }
 document.addEventListener('click',e=>{
   const a=e.target.closest('[data-edit]'); if(!a) return;
-  e.preventDefault(); const it=items.find(x=>x.id===a.dataset.edit); if(it) openForm(it);
+  e.preventDefault(); if(!Owner.isOwner()){toast('Deadlines are view-only ♡'); return}
+  const it=items.find(x=>x.id===a.dataset.edit); if(it) openForm(it);
 });
 (function sparkles(){
   const fx=document.createElement('div'); fx.className='fx'; fx.setAttribute('aria-hidden','true');
@@ -2621,6 +2637,17 @@ renderProfile(); renderMood(); tick(); setInterval(tick,1000);
 WM.start();
 fillSelects(); load();
 setInterval(render,60*60*1000); // keeps "days left" fresh if the tab stays open
+
+/* keep deadlines fresh on every device: reload from Google Sheets every minute and when you come back to the tab
+   (skipped while a form is open or right after you saved something, so your own edits are never overwritten) */
+let lastPull=Date.now();
+const basePush=push;
+push=function(...a){lastPull=Date.now(); return basePush.apply(this,a)};
+function pullDeadlines(){
+  if(!API||document.hidden||$$('.overlay.open').length||Date.now()-lastPull<20000) return;
+  lastPull=Date.now(); load();
+}
+setInterval(pullDeadlines,60000); document.addEventListener('visibilitychange',pullDeadlines);
 </script>
 </body>
 </html>
