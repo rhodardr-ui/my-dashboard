@@ -400,6 +400,29 @@ label.f textarea{min-height:64px;resize:vertical}
 .bk-p{width:92px;height:5px;border-radius:9px;background:var(--lpink);margin-top:5px;overflow:hidden}
 .bk-p i{display:block;height:100%;background:var(--pink)}
 .bk-pct{font-size:10.5px;color:var(--dpink);font-weight:700}
+.book-open{position:relative}
+/* series folders: the real covers fanned out like a little stack */
+.cover.stack{position:relative;overflow:visible;background:none;box-shadow:none}
+.cover.stack .st{position:absolute;inset:0;border-radius:3px 10px 10px 3px;overflow:hidden;background:var(--lav);transition:transform .25s;
+  box-shadow:inset 7px 0 8px -5px rgba(0,0,0,.28),2px 4px 10px rgba(150,70,110,.28)}
+.cover.stack .st img{width:100%;height:100%;object-fit:cover;display:block}
+.cover.stack .st2{transform:rotate(-9deg) translate(-12px,5px) scale(.9)}
+.cover.stack .st1{transform:rotate(7deg) translate(12px,3px) scale(.94)}
+.book-open:hover .cover.stack{transform:none}
+.book-open:hover .cover.stack .st2{transform:rotate(-15deg) translate(-22px,2px) scale(.9)}
+.book-open:hover .cover.stack .st1{transform:rotate(12deg) translate(22px,0) scale(.94)}
+.book-open:hover .cover.stack .st0{transform:translateY(-4px)}
+.bk-tag.fold{top:auto;bottom:auto;top:138px;transform:translateX(-50%);background:var(--pink);color:#fff;border-color:#fff}
+.bk-num{position:absolute;top:-8px;left:calc(50% - 64px);min-width:28px;height:28px;padding:0 6px;border-radius:999px;background:var(--dpink);color:#fff;
+  border:2px solid #fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;box-shadow:1px 2px 0 var(--blush)}
+.bk-mv{position:absolute;top:-7px;left:calc(50% + 18px);width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);background:#fff;font-size:11px;line-height:1;padding:0;opacity:0;transition:opacity .15s}
+.book:hover .bk-mv,.bk-mv:focus-visible{opacity:1}
+.shelf-head{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+.shelf-head[hidden]{display:none}
+.shelf-head b{font-family:var(--head);font-weight:400;font-size:24px;color:var(--pink);text-shadow:1.5px 1.5px 0 #F7CBE4}
+.shelf-head span{font-size:12px;font-weight:700}
+.bk-tag{position:absolute;top:6px;left:50%;transform:translateX(-50%) rotate(-3deg);background:#fff;border:1.5px solid var(--pink);color:var(--dpink);
+  font-size:10px;font-weight:700;padding:1px 8px;border-radius:999px;box-shadow:1px 2px 0 var(--blush);white-space:nowrap}
 .bk-del{position:absolute;top:-7px;left:calc(50% + 44px);width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--dpink);font-size:11px;line-height:1;padding:0;opacity:0;transition:opacity .15s}
 .book:hover .bk-del,.bk-del:focus-visible{opacity:1}
 .shelf-empty{grid-column:1/-1;text-align:center;padding:26px 0}
@@ -726,6 +749,19 @@ body{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
 .desktop .layout{flex:1 1 auto;min-height:0;width:100%;max-width:1240px;margin:0 auto 12px;grid-template-rows:minmax(0,1fr)}
 .desktop .center{display:flex;flex-direction:column;min-height:0}
 .desktop .scrollbox{flex:1 1 auto;height:auto;min-height:0}
+/* owner vs visitor view */
+body.visitor .owner-only{display:none!important}
+.visitor-only{display:none}
+body.visitor .visitor-only{display:inline}
+.write-only{display:none!important}
+body.can-write .write-only{display:inline-flex!important}
+body.visitor .desktop .w-grid{grid-template-columns:minmax(0,1fr)}
+.tb-own{font-size:10.5px;font-weight:700;color:#fff;text-shadow:0 1px 0 #C24A7B;white-space:nowrap}
+.tray-key{width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(255,255,255,.8);background:rgba(255,255,255,.25);font-size:14px;padding:0;opacity:.75}
+.tray-key:hover{opacity:1;background:rgba(255,255,255,.45)}
+.tray-key.on{opacity:1;background:#fff;box-shadow:0 0 0 2px var(--dpink)}
+@media(max-width:900px){.tb-own{display:none}}
+
 /* compact side columns so they fit the screen without scrolling (sizes follow screen height) */
 .desktop .side{padding:12px 14px}
 .desktop .side-h{font-size:24px;margin:0 0 6px}
@@ -823,11 +859,11 @@ body{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
   <nav class="navbar icon-nav" aria-label="Apps">
     <button class="nav-ico" data-app="home"><span class="ni" data-px="home"></span><span class="nl">Home</span></button>
     <button class="nav-ico" data-app="about"><span class="ni" data-px="about"></span><span class="nl">About</span></button>
-    <button class="nav-ico" data-app="links"><span class="ni" data-px="links"></span><span class="nl">Quick Links</span></button>
-    <button class="nav-ico" data-app="deadlines"><span class="ni" data-px="deadlines"></span><span class="nl">Deadlines</span></button>
-    <button class="nav-ico" data-app="notes"><span class="ni" data-px="notes"></span><span class="nl">Notes</span></button>
+    <button class="nav-ico owner-only" data-app="links"><span class="ni" data-px="links"></span><span class="nl">Quick Links</span></button>
+    <button class="nav-ico owner-only" data-app="deadlines"><span class="ni" data-px="deadlines"></span><span class="nl">Deadlines</span></button>
+    <button class="nav-ico owner-only" data-app="notes"><span class="ni" data-px="notes"></span><span class="nl">Notes</span></button>
     <button class="nav-ico" data-app="books"><span class="ni" data-px="books"></span><span class="nl">Books</span></button>
-    <button class="nav-ico" id="bSettings" data-app="settings" title="Settings"><span class="ni" data-px="settings"></span><span class="nl">Settings</span></button>
+    <button class="nav-ico owner-only" id="bSettings" data-app="settings" title="Settings"><span class="ni" data-px="settings"></span><span class="nl">Settings</span></button>
     <span class="nav-shine" aria-hidden="true"></span>
   </nav>
 
@@ -964,7 +1000,7 @@ body{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
             <div class="big-date" id="bigDate"></div>
             <small>Manila · Philippine Standard Time</small>
           </div>
-          <div class="w-card">
+          <div class="w-card owner-only">
             <h4 class="w-h">✦ how are you feeling? ✦</h4>
             <div class="moods" id="moods"></div>
           </div>
@@ -977,15 +1013,15 @@ body{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
         <div class="stars" aria-hidden="true"></div>
         <div class="w-grid">
           <div class="w-card bday" id="bdayCard"></div>
-          <div class="w-card" id="dueSoon"></div>
+          <div class="w-card owner-only" id="dueSoon"></div>
         </div>
       </div>
     </section>
 
     <!-- RIGHT -->
     <aside class="side side-right">
-      <h2 class="side-h">Updates</h2>
-      <div class="updates w98" id="updates"></div>
+      <h2 class="side-h owner-only">Updates</h2>
+      <div class="updates w98 owner-only" id="updates"></div>
       <h2 class="side-h">Music</h2>
       <div class="player" id="player">
       <div class="pl-bar"><span>♪ now playing</span><span class="pl-win"><i>_</i><i>□</i><i>x</i></span></div>
@@ -1002,8 +1038,8 @@ body{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
         <label class="pl-vol" title="Volume"><span aria-hidden="true">♪</span><input type="range" id="plVol" min="0" max="100" value="45" aria-label="Volume"></label>
       </div>
     </div>
-      <div class="poster" id="dueNext"></div>
-      <div class="b88 badge88" aria-hidden="true"><span class="b88-bar"><i>_</i><i>□</i><i>x</i></span><span class="b88-t">SYNCED W/ SHEETS</span></div>
+      <div class="poster owner-only" id="dueNext"></div>
+      <div class="b88 badge88 owner-only" aria-hidden="true"><span class="b88-bar"><i>_</i><i>□</i><i>x</i></span><span class="b88-t">SYNCED W/ SHEETS</span></div>
     </aside>
   </div>
 </main>
@@ -1120,12 +1156,16 @@ body{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
         <div class="pill-h">Books</div>
         <div class="stars" aria-hidden="true"></div>
         <div class="lib-top">
-          <button class="btn sm" id="bkAdd">+ Add EPUB</button>
+          <button class="btn sm write-only" id="bkPub" title="Upload to GitHub so everyone can read it">⬆ Add to shared shelf</button>
+          <input type="file" id="bkPubFile" accept=".epub,application/epub+zip" multiple hidden>
+          <button class="btn soft sm owner-only" id="bkAdd" title="Only on this device">+ Add private EPUB</button>
           <input type="file" id="bkFile" accept=".epub,application/epub+zip" multiple hidden>
-          <span class="page-note">or drag &amp; drop .epub files here ♡</span>
+          <span class="page-note owner-only">or drag &amp; drop .epub files here ♡</span>
+          <span class="page-note visitor-only">Rhoda's bookshelf ♡ pick a book to read</span>
         </div>
+        <div class="shelf-head" id="shelfHead" hidden></div>
         <div class="shelf" id="shelf"></div>
-        <p class="foot">Books are saved in this browser on this device only. ♡</p>
+        <p class="foot">"shared ♡" books come from the books folder on GitHub and everyone can read them. Books you add here stay on this device only. ♡</p>
       </div>
       <div id="readView" hidden>
         <div class="rd-bar">
@@ -1163,11 +1203,11 @@ body{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
   </div>
   <div class="sm-list">
     <button data-app="about"><i data-px="about"></i>About Me</button>
-    <button data-app="links"><i data-px="links"></i>Quick Links</button>
-    <button data-app="deadlines"><i data-px="deadlines"></i>Deadlines</button>
-    <button data-app="notes"><i data-px="notes"></i>Notes</button>
+    <button class="owner-only" data-app="links"><i data-px="links"></i>Quick Links</button>
+    <button class="owner-only" data-app="deadlines"><i data-px="deadlines"></i>Deadlines</button>
+    <button class="owner-only" data-app="notes"><i data-px="notes"></i>Notes</button>
     <button data-app="books"><i data-px="books"></i>Books</button>
-    <button data-app="settings"><i data-px="settings"></i>Settings</button>
+    <button class="owner-only" data-app="settings"><i data-px="settings"></i>Settings</button>
   </div>
   <div class="sm-foot"><button data-app="home"><i data-px="home"></i>Home screen</button></div>
 </div>
@@ -1176,7 +1216,7 @@ body{display:block;height:100vh;height:100dvh;overflow:hidden;padding:0}
   <button class="start-btn" id="startBtn" aria-haspopup="true" aria-expanded="false" aria-controls="startMenu">♡ Start</button>
   <div class="tb-apps" id="tbApps"></div>
   <div class="tb-tray">
-    <button class="tray-music" id="trayMusic" title="Music" aria-label="Open music">♪</button>
+    <span class="tb-own" title="Rhoda's Dashboard ♡ made by Rhoda">© 2026 Rhoda</span><button class="tray-key" id="ownerBtn" title="Owner sign-in" aria-label="Owner sign-in">🔑</button><button class="tray-music" id="trayMusic" title="Music" aria-label="Open music">♪</button>
     <div class="tb-clock"><b id="tbTime">--:--</b><span id="tbDate"></span></div>
   </div>
 </footer>
@@ -1630,6 +1670,57 @@ const PROFILE = {
 };
 const LS_MOOD='rhoda_dash_mood';
 
+/* --- owner vs visitor ---
+   Visitors (anyone opening the GitHub link) see a public "Welcome to Rhoda's Dashboard" view.
+   Rhoda is the owner when she opens the file on her own computer, or after signing in with the 🔑 on the taskbar.
+   Add ?visitor to the link to preview what visitors see. */
+const Owner=(()=>{
+  const KEY='rhoda_gh_token';
+  const REPO='';            // optional, e.g. 'your-username/rhoda-dashboard' (found automatically on GitHub Pages)
+  function repo(){
+    if(REPO) return REPO;
+    const h=location.hostname; if(!/\.github\.io$/i.test(h)) return '';
+    const seg=location.pathname.split('/').filter(Boolean)[0];
+    return h.split('.')[0]+'/'+((seg&&!/\.html?$/i.test(seg))?seg:h);
+  }
+  const token=()=>lsGet(KEY,'')||'';
+  const preview=new URLSearchParams(location.search).has('visitor');
+  const local=()=>!/^https?:$/.test(location.protocol)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const isOwner=()=>!preview&&(!!token()||local());
+  const canWrite=()=>!preview&&!!(token()&&repo());
+  async function api(path,opt={}){
+    const t=token(), r=await fetch('https://api.github.com/repos/'+repo()+path,{...opt,
+      headers:{Accept:'application/vnd.github+json',...(t?{Authorization:'Bearer '+t}:{}),...(opt.headers||{})}});
+    if(!r.ok){let m=''; try{m=(await r.json()).message}catch(e){} const err=new Error(m||('GitHub error '+r.status)); err.status=r.status; throw err}
+    return r.status===204?null:(opt.raw?r.text():r.json());
+  }
+  function apply(){
+    document.body.classList.toggle('visitor',!isOwner());
+    document.body.classList.toggle('can-write',canWrite());
+    const k=$('#ownerBtn'); k.classList.toggle('on',canWrite());
+    k.title=canWrite()?'Owner mode is on (click to sign out)':preview?'Previewing as a visitor':'Owner sign-in';
+  }
+  async function signIn(){
+    if(preview){toast('You are previewing the visitor view. Remove ?visitor from the link to go back'); return}
+    if(token()){
+      if(confirm('Sign out of owner mode on this browser?')){lsSet(KEY,''); apply(); toast('Signed out ♡'); Reader.refresh()}
+      return;
+    }
+    if(!repo()){toast('Owner sign-in works on your live GitHub link ♡'); return}
+    const t=(prompt('Owner sign-in ♡\nPaste your GitHub access key\n(a fine-grained token for '+repo()+' with "Contents: Read and write"):')||'').trim();
+    if(!t) return;
+    try{
+      const r=await fetch('https://api.github.com/repos/'+repo(),{headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+t}});
+      const j=await r.json(); if(!r.ok) throw new Error(j.message||r.status);
+      if(j.permissions&&!j.permissions.push) throw new Error("this key can't make changes to the repository");
+      lsSet(KEY,t); apply(); toast('Welcome back, Rhoda ♡ owner mode is on'); Reader.refresh();
+    }catch(e){toast('Sign-in failed: '+e.message)}
+  }
+  $('#ownerBtn').onclick=signIn;
+  return {repo,token,isOwner,canWrite,api,apply,signIn,preview};
+})();
+Owner.apply();
+
 /* --- pixel-art app icons (original 16x16 drawings; each letter = one pixel colour, "." = clear) --- */
 const PX=(()=>{
   const PAL={k:'#6B3F5E',w:'#FFFFFF',p:'#F49AC1',P:'#D9578A',l:'#FBD3E6',v:'#C9A7E8',V:'#9A72C9',b:'#B9D3F7',B:'#7FA3E0',
@@ -1694,7 +1785,9 @@ const WM=(()=>{
     if(id==='notes') Notes.open();
     if(id==='books') Reader.show();
   }
+  const OWNER_APPS=['links','deadlines','notes','settings'];
   function open(id){
+    if(OWNER_APPS.includes(id)&&!Owner.isOwner()){ toast("That one's just for Rhoda ♡"); return }
     if(id==='settings'){ $('#bSettings').onclick(); return }
     if(id==='desktop'||id==='home'){ showDesktop(); return }
     const w=win(id); if(!w) return;
@@ -1753,7 +1846,7 @@ $$('[data-go]').forEach(b=>b.addEventListener('click',()=>GO[b.dataset.go]()));
 /* --- time in Manila --- */
 function mnl(opts){return new Date().toLocaleString('en-US',Object.assign({timeZone:PROFILE.tz},opts))}
 function mnlParts(){const p={};new Intl.DateTimeFormat('en-US',{timeZone:PROFILE.tz,year:'numeric',month:'numeric',day:'numeric',hour:'numeric',hour12:false}).formatToParts(new Date()).forEach(x=>p[x.type]=+x.value);p.hour%=24;return p}
-function greetingText(){const h=mnlParts().hour;const g=h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':h<22?'Good evening':'Good night';return `${g}, ${PROFILE.name} ♡`}
+function greetingText(){if(!Owner.isOwner()) return "Welcome to Rhoda's Dashboard ♡"; const h=mnlParts().hour;const g=h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':h<22?'Good evening':'Good night';return `${g}, ${PROFILE.name} ♡`}
 function tick(){
   $('#bigClock').textContent=mnl({hour:'numeric',minute:'2-digit',second:'2-digit'});
   $('#tbTime').textContent=mnl({hour:'numeric',minute:'2-digit'});
@@ -1916,6 +2009,19 @@ const Reader=(()=>{
     let cover=items.find(m=>/\bcover-image\b/.test(m.props));
     if(!cover){const mc=[...opf.getElementsByTagNameNS('*','meta')].find(m=>m.getAttribute('name')==='cover'); if(mc) cover=man[mc.getAttribute('content')]}
     if(!cover) cover=items.find(m=>/^image\//.test(m.type)&&/cover/i.test(m.href));
+    if(!cover){   // no labelled cover: use the first picture on the cover page (EPUB2 guide) or on the book's first page
+      const ref=[...opf.getElementsByTagNameNS('*','reference')].find(r=>/cover/i.test(r.getAttribute('type')||''));
+      for(const pg of [ref&&resolve(opfPath,(ref.getAttribute('href')||'').split('#')[0]),spine[0]].filter(Boolean)){
+        const d=xml(await z.text(pg),'text/html'), im=d.querySelector('img[src]'), si=d.querySelector('image');
+        const h=im?im.getAttribute('src'):si&&(si.getAttribute('xlink:href')||si.getAttribute('href'));
+        if(h){cover={href:resolve(pg,h)}; break}
+      }
+    }
+    // series info (Calibre and EPUB3 styles) so books can be grouped and numbered automatically
+    const metas=[...opf.getElementsByTagNameNS('*','meta')], mval=n=>{const m=metas.find(x=>x.getAttribute('name')===n); return m?(m.getAttribute('content')||'').trim():''};
+    let series=mval('calibre:series'), seriesIndex=parseFloat(mval('calibre:series_index'))||0;
+    if(!series){const c=metas.find(x=>x.getAttribute('property')==='belongs-to-collection');
+      if(c){series=c.textContent.trim(); const id=c.getAttribute('id'), gp=id&&metas.find(x=>x.getAttribute('refines')==='#'+id&&x.getAttribute('property')==='group-position'); if(gp) seriesIndex=parseFloat(gp.textContent)||0}}
     let toc=[];
     const navItem=items.find(m=>/\bnav\b/.test(m.props));
     if(navItem){
@@ -1935,7 +2041,13 @@ const Reader=(()=>{
         if(nm) walk(nm,0)}
     }
     if(!toc.length) toc=spine.map((p,i)=>({label:'Section '+(i+1),path:p,frag:'',d:0}));
-    return {title:meta('title')||'Untitled',author:meta('creator'),spine,toc,cover:cover&&cover.href};
+    return {title:meta('title')||'Untitled',author:meta('creator'),spine,toc,cover:cover&&cover.href,series,seriesIndex};
+  }
+  // the details we keep on the bookshelf for each book
+  async function bookFields(z){
+    const b=await parseBook(z); let cover=null;
+    if(b.cover){const bytes=await z.bytes(b.cover); if(bytes) cover=new Blob([bytes],{type:MIME[ext(b.cover)]||'image/jpeg'})}
+    return {title:b.title,author:b.author,cover,chapters:b.spine.length,series:b.series,seriesIndex:b.seriesIndex,metaV:2};
   }
 
   /* add books */
@@ -1943,31 +2055,158 @@ const Reader=(()=>{
     if(!('DecompressionStream' in window)){toast("This browser can't open EPUBs. Try Edge or Chrome");return}
     for(const f of files){
       try{
-        const z=await openZip(f), b=await parseBook(z); let cover=null;
-        if(b.cover){const bytes=await z.bytes(b.cover); if(bytes) cover=new Blob([bytes],{type:MIME[ext(b.cover)]||'image/jpeg'})}
-        await putBook({id:'B-'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),title:b.title,author:b.author,added:Date.now(),file:f,cover,chapters:b.spine.length});
-        toast('Added "'+b.title+'" ♡');
+        const fields=await bookFields(await openZip(f));
+        await putBook({id:'B-'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),added:Date.now(),file:f,...fields});
+        toast('Added "'+fields.title+'" ♡');
       }catch(e){toast("Couldn't open "+(f.name||'that file')+': '+e.message)}
     }
     await renderShelf();
   }
 
-  /* bookshelf */
-  let coverURLs=[];
-  async function renderShelf(){
+  /* bookshelf (with series folders) */
+  let coverURLs=[], folder=null, upgrading=false;
+  // which folder a book belongs in: one you chose > its GitHub sub-folder > the series written inside the EPUB
+  const groupOf=b=>b.noFolder?'':(b.folder||b.pubFolder||b.series||'');
+  const pctOf=b=>{const p=pos(b.id); return Math.min(100,Math.round(100*(p.ch+p.frac)/Math.max(1,b.chapters)))};
+  const recentOf=b=>pos(b.id).t||b.added;
+  function coverHTML(b){
+    if(b.cover){const u=URL.createObjectURL(b.cover); coverURLs.push(u); return `<img src="${u}" alt="">`}
+    return `<span class="gen-cover"><b>${esc(b.title)}</b><small>${esc(b.author||'')}</small></span>`;
+  }
+  function bookCard(b,num){
+    const pct=pctOf(b), started=pos(b.id).t;
+    return `<div class="book"><button class="book-open" data-book="${esc(b.id)}" title="Open ${esc(b.title)}"><span class="cover">${coverHTML(b)}</span>
+      ${b.pub?'<span class="bk-tag">shared ♡</span>':''}${num?`<span class="bk-num">#${esc(String(num))}</span>`:''}
+      <span class="bk-t">${esc(b.title)}</span><span class="bk-a">${esc(b.author||'')}</span><span class="bk-p"><i style="width:${pct}%"></i></span>
+      <span class="bk-pct">${started?pct+'% read':'new ♡'}</span></button>
+      ${b.pub&&!Owner.canWrite()?'':`<button class="bk-mv" data-move="${esc(b.id)}" title="Put in a folder" aria-label="Put ${esc(b.title)} in a folder">📁</button><button class="bk-del" data-del="${esc(b.id)}" title="${b.pub?'Delete from the shared shelf':'Remove book'}" aria-label="Remove ${esc(b.title)}">✕</button>`}</div>`;
+  }
+  function folderCard(name,list){
+    const front=list.slice(0,3), avg=Math.round(list.reduce((s,b)=>s+pctOf(b),0)/list.length);
+    const stack=front.map((b,i)=>`<span class="st st${i}">${coverHTML(b)}</span>`).reverse().join('');
+    return `<div class="book folder"><button class="book-open" data-folder="${esc(name)}" title="Open ${esc(name)}"><span class="cover stack">${stack}</span>
+      <span class="bk-tag fold">📁 ${list.length} books</span>
+      <span class="bk-t">${esc(name)}</span><span class="bk-a">${esc(list[0].author||'')}</span><span class="bk-p"><i style="width:${avg}%"></i></span>
+      <span class="bk-pct">${list.some(b=>pos(b.id).t)?avg+'% read':'series ♡'}</span></button></div>`;
+  }
+  async function upgrade(list){           // fill in series + cover for books added before folders existed
+    for(const b of list){
+      try{const f=await bookFields(await openZip(b.file)); b.series=f.series; b.seriesIndex=f.seriesIndex; if(!b.cover&&f.cover) b.cover=f.cover}catch(e){}
+      b.metaV=2; try{await putBook(b)}catch(e){}
+    }
+  }
+  // shelf redraws run one at a time (the newest request always wins), so syncing and clicking can't mix up the shelf
+  let drawing=null, redraw=false;
+  function renderShelf(){
+    if(drawing){redraw=true; return drawing}
+    drawing=(async()=>{try{do{redraw=false; await drawShelf()}while(redraw)}finally{drawing=null}})();
+    return drawing;
+  }
+  async function drawShelf(){
     coverURLs.forEach(u=>URL.revokeObjectURL(u)); coverURLs=[];
     let books=[]; try{books=await allBooks()}catch(e){toast('Book storage is unavailable in this browser')}
-    books.sort((a,b)=>(pos(b.id).t||b.added)-(pos(a.id).t||a.added));
-    $('#shelf').innerHTML=books.length?books.map(b=>{
-      const p=pos(b.id), pct=Math.min(100,Math.round(100*(p.ch+p.frac)/Math.max(1,b.chapters)));
-      let cv; if(b.cover){const u=URL.createObjectURL(b.cover); coverURLs.push(u); cv=`<img src="${u}" alt="">`}
-      else cv=`<span class="gen-cover"><b>${esc(b.title)}</b><small>${esc(b.author||'')}</small></span>`;
-      return `<div class="book"><button class="book-open" data-book="${esc(b.id)}" title="Open ${esc(b.title)}"><span class="cover">${cv}</span>
-        <span class="bk-t">${esc(b.title)}</span><span class="bk-a">${esc(b.author||'')}</span><span class="bk-p"><i style="width:${pct}%"></i></span>
-        <span class="bk-pct">${p.t?pct+'% read':'new ♡'}</span></button>
-        <button class="bk-del" data-del="${esc(b.id)}" title="Remove book" aria-label="Remove ${esc(b.title)}">✕</button></div>`}).join('')
-      :`<div class="shelf-empty"><p>your bookshelf is empty ^_^</p><span>add an .epub book to start reading</span></div>`;
+    const old=books.filter(b=>(b.metaV||0)<2);
+    if(old.length&&!upgrading){upgrading=true; upgrade(old).then(()=>{upgrading=false; renderShelf()})}
+    const groups={}; books.forEach(b=>{const g=groupOf(b); if(g)(groups[g]=groups[g]||[]).push(b)});
+    // a series of just one book stays loose, unless you (or a GitHub folder) put it in a folder on purpose
+    for(const g of Object.keys(groups)) if(groups[g].length<2&&!groups[g].some(b=>b.folder||b.pubFolder)) delete groups[g];
+    // its number in the folder: the one you set, or the book's own series number when the folder is that series
+    const numOf=b=>b.libN||(b.series&&b.series===groupOf(b)?b.seriesIndex:0)||0;
+    const inOrder=(a,b)=>numOf(a)-numOf(b)||String(a.pub||a.title).localeCompare(String(b.pub||b.title),undefined,{numeric:true});
+    const head=$('#shelfHead');
+    if(folder&&groups[folder]){
+      const list=groups[folder].sort(inOrder);
+      const canRename=Owner.canWrite()||list.every(b=>!b.pub);
+      head.hidden=false; head.innerHTML=`<button class="btn soft sm" data-folder-back>‹ All books</button><b>📁 ${esc(folder)}</b><span>${list.length} books</span>${canRename?'<button class="btn soft sm" data-rename>✎ Rename</button>':''}`;
+      $('#shelf').innerHTML=list.map((b,i)=>bookCard(b,numOf(b)||i+1)).join('');
+      return;
+    }
+    folder=null; head.hidden=true;
+    const names=Object.keys(groups).sort((a,b)=>Math.max(...groups[b].map(recentOf))-Math.max(...groups[a].map(recentOf)));
+    const loose=books.filter(b=>!groups[groupOf(b)]).sort((a,b)=>recentOf(b)-recentOf(a));
+    $('#shelf').innerHTML=(names.map(n=>folderCard(n,groups[n].sort(inOrder))).join('')+loose.map(b=>bookCard(b)).join(''))
+      ||`<div class="shelf-empty"><p>your bookshelf is empty ^_^</p><span>add an .epub book to start reading</span></div>`;
   }
+
+  /* shared books: EPUBs in the "books" folder of the GitHub repository appear for every visitor.
+     On GitHub Pages the folder is found automatically; you can also list files here by hand, e.g. 'books/my-book.epub'. */
+  const PUBLIC_BOOKS=[];
+  let synced=false;
+  const folderFromPath=p=>{const parts=p.split('/'); return parts.length>2?parts[parts.length-2]:''};   // books/<Series>/<book>.epub
+  const encPath=p=>p.split('/').map(encodeURIComponent).join('/');
+  // the shared folder list, saved online as books/library.json so every device shows the same folders
+  let LIB={books:{}}, libSha='';
+  {const c=lsGet('rhoda_shared_library',null); if(c&&c.data){LIB=c.data; libSha=c.sha||''}}
+  if(!LIB.books) LIB.books={};
+  const libProps=url=>{const e=LIB.books[url]; return e?{pubFolder:e.folder||'',noFolder:!e.folder,libN:+e.n||0}:{pubFolder:folderFromPath(url),noFolder:false,libN:0}};
+  const fileURL=p=>/\.github\.io$/i.test(location.hostname)||!Owner.repo()?encPath(p):`https://raw.githubusercontent.com/${Owner.repo()}/HEAD/${encPath(p)}`;
+  async function publicBookList(){
+    const list=PUBLIC_BOOKS.map(url=>({url,sha:'',folder:folderFromPath(url)}));
+    if(!Owner.repo()) return list;
+    try{
+      // one request lists every file in the repository, including sub-folders
+      let tree;
+      try{tree=await Owner.api('/git/trees/HEAD?recursive=1')}
+      catch(e){if(e.status===403||e.status===429) return null; const info=await Owner.api(''); tree=await Owner.api('/git/trees/'+encodeURIComponent(info.default_branch||'main')+'?recursive=1')}
+      const files=tree.tree||[];
+      files.filter(f=>f.type==='blob'&&/^books\/.+\.epub$/i.test(f.path))
+        .forEach(f=>{if(!list.some(x=>x.url===f.path)) list.push({url:f.path,sha:f.sha,folder:folderFromPath(f.path)})});
+      const lj=files.find(f=>f.path==='books/library.json');
+      if(lj&&lj.sha!==libSha){
+        LIB=JSON.parse(await Owner.api('/contents/books/library.json',{raw:true,headers:{Accept:'application/vnd.github.raw'}}));
+        if(!LIB.books) LIB.books={}; libSha=lj.sha; lsSet('rhoda_shared_library',{sha:libSha,data:LIB});
+      }else if(!lj){LIB={books:{}}; libSha=''}
+    }catch(e){ if(e.status===404||e.status===409) return list; return null }   // GitHub busy: keep what we already have
+    return list;
+  }
+  async function syncPublic(){
+    if(synced) return; synced=true;
+    const list=await publicBookList(); if(!list) return;
+    const pubs=(await allBooks()).filter(b=>b.pub);
+    for(const b of pubs) if(!list.some(x=>x.url===b.pub)) await delBook(b.id);      // removed from GitHub
+    for(const it of list){
+      const have=pubs.find(b=>b.pub===it.url);
+      if(have&&(!it.sha||have.sha===it.sha)){                                       // same file: just refresh its folder
+        const lp=libProps(it.url); if(have.pubFolder!==lp.pubFolder||!!have.noFolder!==lp.noFolder||(have.libN||0)!==lp.libN){Object.assign(have,lp); await putBook(have)}
+        continue;
+      }
+      try{
+        const res=await fetch(fileURL(it.url)); if(!res.ok) continue;
+        const blob=await res.blob(), fields=await bookFields(await openZip(blob));
+        await putBook({id:'P-'+it.url,pub:it.url,sha:it.sha,added:have?have.added:Date.now(),file:blob,...fields,...libProps(it.url)});
+      }catch(e){}
+    }
+  }
+
+  /* owner tools: change the shared shelf on GitHub (needs owner sign-in on the taskbar 🔑) */
+  const b64utf8=s=>{const by=new TextEncoder().encode(s); let bin=''; for(let i=0;i<by.length;i+=0x8000) bin+=String.fromCharCode.apply(null,by.subarray(i,i+0x8000)); return btoa(bin)};
+  const fileB64=f=>new Promise((res,rej)=>{const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=()=>rej(r.error); r.readAsDataURL(f)});
+  async function saveLib(msg){
+    const put=sha=>Owner.api('/contents/books/library.json',{method:'PUT',body:JSON.stringify({message:msg,content:b64utf8(JSON.stringify(LIB,null,1)),...(sha?{sha}:{})})});
+    let r;
+    try{r=await put(libSha)}
+    catch(e){ if(e.status!==409&&e.status!==422) throw e; let cur=''; try{cur=(await Owner.api('/contents/books/library.json')).sha}catch(_){} r=await put(cur) }
+    libSha=r.content.sha; lsSet('rhoda_shared_library',{sha:libSha,data:LIB});
+  }
+  async function uploadShared(files){
+    for(const f of files){
+      try{
+        if(f.size>45*1024*1024){toast('"'+f.name+'" is too big to upload (about 45 MB max)'); continue}
+        const fields=await bookFields(await openZip(f));                     // make sure it's a real EPUB first
+        const name=f.name.replace(/[\\/:*?"<>|#%]+/g,' ').replace(/\s+/g,' ').trim()||'book.epub';
+        let path='books/'+name;
+        try{await Owner.api('/contents/'+encPath(path)); path='books/'+name.replace(/\.epub$/i,'')+' '+Date.now().toString(36)+'.epub'}catch(e){if(e.status!==404) throw e}
+        toast('Uploading "'+fields.title+'"…');
+        const r=await Owner.api('/contents/'+encPath(path),{method:'PUT',body:JSON.stringify({message:'Add book: '+fields.title,content:await fileB64(f)})});
+        if(folder) LIB.books[path]={folder,n:0};                                 // added while a folder is open → goes in that folder
+        await putBook({id:'P-'+path,pub:path,sha:r.content.sha,added:Date.now(),file:f,...fields,...libProps(path)});
+        if(folder) await saveLib('Add "'+fields.title+'" to '+folder);
+        toast('Shared "'+fields.title+'" ♡ everyone can see it in about a minute');
+      }catch(e){toast("Couldn't upload "+f.name+': '+e.message)}
+      await renderShelf();
+    }
+  }
+  const parseFolder=s=>{const m=String(s).match(/^(.*?)(?:\s*#\s*(\d+(?:\.\d+)?))?\s*$/); return {name:(m[1]||'').trim(),n:m[2]?parseFloat(m[2]):0}};
 
   /* reader state */
   let book=null, zip=null, info=null, urls=new Map(), cssCache=new Map(), ch=0, page=0, pages=1, W=0, H=0, P=36, idoc=null, frameP=null, busy=false, saveT;
@@ -2132,11 +2371,59 @@ a{color:#D9578A}
   const lib=$('#libView');
   lib.addEventListener('dragover',e=>{e.preventDefault(); lib.classList.add('drag')});
   lib.addEventListener('dragleave',e=>{if(!lib.contains(e.relatedTarget)) lib.classList.remove('drag')});
-  lib.addEventListener('drop',e=>{e.preventDefault(); lib.classList.remove('drag');
+  lib.addEventListener('drop',e=>{e.preventDefault(); lib.classList.remove('drag'); if(!Owner.isOwner()) return;
     const fs=[...e.dataTransfer.files].filter(f=>/\.epub$/i.test(f.name)); fs.length?importFiles(fs):toast('Drop .epub files only ♡')});
+  $('#bkPub').onclick=()=>$('#bkPubFile').click();
+  $('#bkPubFile').onchange=e=>{const fs=[...e.target.files]; e.target.value=''; if(fs.length) uploadShared(fs)};
+  $('#shelfHead').addEventListener('click',async e=>{
+    if(e.target.closest('[data-folder-back]')){folder=null; renderShelf(); return}
+    if(e.target.closest('[data-rename]')){
+      const nn=prompt('New name for the folder "'+folder+'":',folder); if(!nn||!nn.trim()||nn.trim()===folder) return;
+      const name=nn.trim(), list=(await allBooks()).filter(b=>groupOf(b)===folder); let shared=false;
+      for(const b of list){
+        if(b.pub){ if(!Owner.canWrite()) continue; LIB.books[b.pub]={folder:name,n:b.libN||b.seriesIndex||0}; Object.assign(b,libProps(b.pub)); shared=true }
+        else {b.folder=name; b.noFolder=false}
+        await putBook(b);
+      }
+      folder=name; renderShelf();
+      if(shared){try{await saveLib('Rename folder to '+name); toast('Renamed for all devices ♡')}catch(err){toast("Couldn't save to GitHub: "+err.message)}} else toast('Folder renamed');
+    }
+  });
   $('#shelf').addEventListener('click',async e=>{
+    const fo=e.target.closest('[data-folder]'); if(fo){folder=fo.dataset.folder; $('#win-books .win-body').scrollTop=0; renderShelf(); return}
+    const mv=e.target.closest('[data-move]');
+    if(mv){
+      const b=await getBook(mv.dataset.move); if(!b) return;
+      const cur=groupOf(b), num=b.libN||b.seriesIndex||0;
+      const ans=prompt('Which folder (series) should "'+b.title+'" go in?\nType a folder name. Add #number for its place in the series, e.g. "Moon Saga #2".\nLeave it empty to take the book out of its folder.',cur?cur+(num?' #'+num:''):'');
+      if(ans===null) return;
+      const {name,n}=parseFolder(ans);
+      if(b.pub){
+        if(!Owner.canWrite()) return;
+        LIB.books[b.pub]={folder:name,n}; Object.assign(b,libProps(b.pub)); await putBook(b); renderShelf();
+        try{await saveLib('Organize "'+b.title+'"'); toast((name?'Moved to 📁 '+name:'Taken out of its folder')+' · saved for all devices ♡')}catch(err){toast("Couldn't save to GitHub: "+err.message)}
+      }else{
+        b.folder=name; b.noFolder=!name; b.libN=n; await putBook(b);
+        toast(name?'Moved to 📁 '+name:'Taken out of its folder'); renderShelf();
+      }
+      return;
+    }
     const d=e.target.closest('[data-del]');
-    if(d){const b=await getBook(d.dataset.del); if(b&&confirm('Remove "'+b.title+'" from your bookshelf?')){await delBook(b.id); const all=lsGet(POS,{}); delete all[b.id]; lsSet(POS,all); renderShelf(); toast('Book removed')} return}
+    if(d){
+      const b=await getBook(d.dataset.del); if(!b) return;
+      if(b.pub){
+        if(!Owner.canWrite()||!confirm('Delete "'+b.title+'" from the shared shelf for everyone?\n(This deletes the file from your GitHub repository.)')) return;
+        try{
+          let sha=b.sha; if(!sha) sha=(await Owner.api('/contents/'+encPath(b.pub))).sha;
+          await Owner.api('/contents/'+encPath(b.pub),{method:'DELETE',body:JSON.stringify({message:'Remove book: '+b.title,sha})});
+          await delBook(b.id); renderShelf(); toast('Deleted from the shared shelf');
+          if(LIB.books[b.pub]){delete LIB.books[b.pub]; await saveLib('Remove "'+b.title+'"')}
+        }catch(err){toast("Couldn't delete: "+err.message)}
+        return;
+      }
+      if(confirm('Remove "'+b.title+'" from your bookshelf?')){await delBook(b.id); const all=lsGet(POS,{}); delete all[b.id]; lsSet(POS,all); renderShelf(); toast('Book removed')}
+      return;
+    }
     const o=e.target.closest('[data-book]'); if(o) open(o.dataset.book);
   });
   $('#rdBack').onclick=close;
@@ -2154,7 +2441,8 @@ a{color:#D9578A}
   if(window.ResizeObserver) new ResizeObserver(later).observe($('#win-books .win-body'));
 
   return {
-    show(){ if(!$('#readView').hidden) setTimeout(relayout,30); else renderShelf() },
+    show(){ if(!$('#readView').hidden) setTimeout(relayout,30); else {renderShelf(); if(!synced) syncPublic().then(renderShelf)} },
+    refresh(){ synced=false; if(!$('#win-books').hidden&&$('#readView').hidden){renderShelf(); syncPublic().then(renderShelf)} },
     importFiles, open, next, prev,
     _state:()=>({ch,page,pages,title:book&&book.title,toc:info&&info.toc.length,spine:info&&info.spine.length,W,H})
   };
