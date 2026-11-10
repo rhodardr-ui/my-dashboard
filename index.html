@@ -1371,7 +1371,6 @@ body.reading .toast,#readView:fullscreen~.toast{bottom:22px}
     <div class="wk-tabs" role="tablist">
       <button class="wk-tab on" data-wtab="dl">📅 Deadlines</button>
       <button class="wk-tab" data-wtab="todo">✓ To-Do</button>
-      <button class="wk-tab" data-wtab="codes"># Control Codes</button>
       <button class="wk-tab" data-wtab="tpl">✉ Templates</button>
       <button class="wk-tab" data-wtab="cal">▦ Calendar</button>
     </div>
@@ -1420,28 +1419,6 @@ body.reading .toast,#readView:fullscreen~.toast{bottom:22px}
         <div class="td-col" data-col="done"><h4>Done <span></span></h4><div class="td-list"></div></div>
       </div>
       <div class="td-foot"><span class="page-note">drag cards between columns ♡ saved on this device only</span><button class="btn soft sm" id="tdClear" hidden>Clear done</button></div>
-    </div>
-
-    <!-- Control codes -->
-    <div class="wk-pane" id="wk-codes" hidden>
-      <div class="cc-gen w-card">
-        <label for="ccSeries">Series</label>
-        <div class="cc-row"><select id="ccSeries"></select><span class="cc-next">next code: <b id="ccPreview">—</b></span></div>
-        <label for="ccTitle">For</label>
-        <input id="ccTitle" placeholder="What is it for? e.g. Service contract – Client A">
-        <label for="ccParty">Person</label>
-        <input id="ccParty" placeholder="Person / client (optional)">
-        <span></span>
-        <div class="cc-row"><button class="btn" id="ccGo"># Get code &amp; copy</button><span class="cc-last" id="ccLast"></span></div>
-      </div>
-      <div class="cc-tools">
-        <input type="search" id="ccSearch" placeholder="Search the log…" aria-label="Search codes">
-        <button class="btn soft sm" id="ccManage">⚙ Manage series</button>
-        <button class="btn soft sm" id="ccExport">Export CSV</button>
-      </div>
-      <div class="cc-series" id="ccSeriesBox" hidden></div>
-      <table class="cc-log"><thead><tr><th>Code</th><th>For</th><th>Person</th><th>Date</th><th></th></tr></thead><tbody id="ccLog"></tbody></table>
-      <p class="foot">Codes are saved on this device only. ♡</p>
     </div>
 
     <!-- Templates -->
@@ -3169,7 +3146,7 @@ const Music=(()=>{
   return {start,pause};
 })();
 
-/* ===== Work app: To-Do board, Control Codes, Templates, Calendar + working days (saved on this device) ===== */
+/* ===== Work app: To-Do board, Templates, Calendar + working days (saved on this device) ===== */
 const Work=(()=>{
   const K={todo:'rhoda_work_todo',codes:'rhoda_work_codes',tpl:'rhoda_work_templates',hol:'rhoda_work_holidays'};
   const wid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -3179,7 +3156,7 @@ const Work=(()=>{
 
   /* tabs */
   let tab='dl';
-  function showTab(t){tab=t; $$('.wk-tab').forEach(b=>b.classList.toggle('on',b.dataset.wtab===t)); $$('.wk-pane').forEach(p=>p.hidden=p.id!=='wk-'+t); ({dl:()=>{},todo:renderTodo,codes:renderCodes,tpl:renderTpl,cal:renderCal})[t]()}
+  function showTab(t){tab=t; $$('.wk-tab').forEach(b=>b.classList.toggle('on',b.dataset.wtab===t)); $$('.wk-pane').forEach(p=>p.hidden=p.id!=='wk-'+t); ({dl:()=>{},todo:renderTodo,tpl:renderTpl,cal:renderCal})[t]()}
   $$('.wk-tab').forEach(b=>b.onclick=()=>showTab(b.dataset.wtab));
 
   /* ---- To-Do board ---- */
@@ -3226,64 +3203,6 @@ const Work=(()=>{
     col.addEventListener('dragover',e=>{if(dragId){e.preventDefault(); col.classList.add('over')}});
     col.addEventListener('dragleave',e=>{if(!col.contains(e.relatedTarget)) col.classList.remove('over')});
     col.addEventListener('drop',e=>{e.preventDefault(); col.classList.remove('over'); const t=todos.find(x=>x.id===dragId); if(t&&t.col!==col.dataset.col) moveTo(t,col.dataset.col)});
-  });
-
-  /* ---- Control codes ---- */
-  let CC=lsGet(K.codes,null)||{series:[
-    {id:'bap',prefix:'BAP',year:true,digits:3,next:12,yearOf:2026},
-    {id:'ack',prefix:'ADMIN-ACK',year:false,digits:4,next:17}],log:[]};
-  const saveCC=()=>lsSet(K.codes,CC);
-  const thisYear=()=>mnlParts().year;
-  function roll(s){if(s.year&&s.yearOf!==thisYear()){s.yearOf=thisYear(); s.next=1}}    // yearly series restart in January
-  const codeOf=(s,n)=>s.prefix+'-'+(s.year?s.yearOf+'-':'')+String(n).padStart(s.digits,'0');
-  const curSeries=()=>CC.series.find(x=>x.id===$('#ccSeries').value);
-  function renderCodes(){
-    CC.series.forEach(roll); saveCC();
-    const sel=$('#ccSeries'), cur=sel.value;
-    sel.innerHTML=CC.series.map(s=>`<option value="${esc(s.id)}">${esc(s.prefix)}${s.year?' (yearly)':''}</option>`).join('');
-    if(CC.series.some(s=>s.id===cur)) sel.value=cur;
-    ccPreview(); ccLog(); if(!$('#ccSeriesBox').hidden) ccSeriesBox();
-  }
-  function ccPreview(){const s=curSeries(); $('#ccPreview').textContent=s?codeOf(s,s.next):'—'}
-  function ccLog(){
-    const q=$('#ccSearch').value.toLowerCase().trim(), rows=CC.log.filter(r=>!q||[r.code,r.title,r.party].join(' ').toLowerCase().includes(q));
-    $('#ccLog').innerHTML=rows.map(r=>`<tr><td><b>${esc(r.code)}</b></td><td>${esc(r.title)}</td><td>${esc(r.party||'')}</td><td>${fmtD(r.date)}</td><td><button class="cc-copy" data-cccopy="${esc(r.code)}" title="Copy" aria-label="Copy ${esc(r.code)}">⧉</button></td></tr>`).join('')
-      ||'<tr><td colspan="5" class="td-empty">no codes yet ♡</td></tr>';
-  }
-  $('#ccSeries').onchange=ccPreview; $('#ccSearch').oninput=ccLog;
-  $('#ccGo').onclick=async()=>{
-    const s=curSeries(); if(!s) return;
-    const title=$('#ccTitle').value.trim(); if(!title){toast('Type what the code is for ♡'); $('#ccTitle').focus(); return}
-    roll(s); const code=codeOf(s,s.next); s.next++;
-    CC.log.unshift({code,title,party:$('#ccParty').value.trim(),date:today(),series:s.id}); saveCC(); await copyText(code);
-    $('#ccTitle').value=''; $('#ccParty').value=''; renderCodes();
-    $('#ccLast').innerHTML=`<span>✓ copied</span> <b>${esc(code)}</b>`; toast(code+' copied ♡');
-  };
-  $('#ccLog').addEventListener('click',async e=>{const b=e.target.closest('[data-cccopy]'); if(b){await copyText(b.dataset.cccopy); toast(b.dataset.cccopy+' copied ♡')}});
-  $('#ccExport').onclick=()=>{
-    const csv=['code,for,person,date'].concat(CC.log.map(r=>[r.code,r.title,r.party||'',r.date].map(csvCell).join(','))).join('\n');
-    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='control-codes-'+today()+'.csv'; a.click();
-  };
-  $('#ccManage').onclick=()=>{const b=$('#ccSeriesBox'); b.hidden=!b.hidden; if(!b.hidden) ccSeriesBox()};
-  function ccSeriesBox(){
-    $('#ccSeriesBox').innerHTML='<table class="cc-ser"><tr><th>Prefix</th><th>Add year</th><th>Digits</th><th>Next no.</th><th>Example</th><th></th></tr>'+
-      CC.series.map(s=>`<tr data-ser="${esc(s.id)}"><td><input data-f="prefix" value="${esc(s.prefix)}" aria-label="Prefix"></td><td><input type="checkbox" data-f="year" ${s.year?'checked':''} aria-label="Add year"></td>
-        <td><input type="number" min="1" max="8" data-f="digits" value="${s.digits}" aria-label="Digits"></td><td><input type="number" min="1" data-f="next" value="${s.next}" aria-label="Next number"></td>
-        <td><code>${esc(codeOf(s,s.next))}</code></td><td><button data-serdel title="Delete series" aria-label="Delete series">✕</button></td></tr>`).join('')+
-      '</table><button class="btn soft sm" id="ccAddSer">+ New series</button><p class="hint">Series with "Add year" start again at 1 every January. Change "Next no." to continue from your last number.</p>';
-  }
-  $('#ccSeriesBox').addEventListener('change',e=>{
-    const tr=e.target.closest('[data-ser]'); if(!tr) return; const s=CC.series.find(x=>x.id===tr.dataset.ser), f=e.target.dataset.f; if(!s||!f) return;
-    if(f==='year'){s.year=e.target.checked; s.yearOf=thisYear()}
-    else if(f==='prefix') s.prefix=e.target.value.trim().toUpperCase()||s.prefix;
-    else s[f]=Math.max(1,parseInt(e.target.value,10)||1);
-    saveCC(); renderCodes();
-  });
-  $('#ccSeriesBox').addEventListener('click',e=>{
-    if(e.target.closest('#ccAddSer')){const p=(prompt('Prefix for the new series (e.g. MEMO, HR-NOTICE):')||'').trim().toUpperCase(); if(!p) return;
-      CC.series.push({id:wid(),prefix:p,year:true,digits:3,next:1,yearOf:thisYear()}); saveCC(); renderCodes(); return}
-    const d=e.target.closest('[data-serdel]');
-    if(d){const s=CC.series.find(x=>x.id===d.closest('[data-ser]').dataset.ser); if(s&&confirm('Delete the series '+s.prefix+'? Codes already in the log stay.')){CC.series=CC.series.filter(x=>x!==s); saveCC(); renderCodes()}}
   });
 
   /* ---- Templates ---- */
