@@ -1046,6 +1046,9 @@ body.dark{--pink:#F7AECB;--dpink:#F5A3C4}
 /* buttons, pills, badges */
 .btn,.btn.primary{background:var(--bp);border-color:var(--bp2);color:var(--berry);text-shadow:none}
 .toast{background:var(--bp);border-color:var(--bp2);color:var(--berry);text-shadow:none}
+/* messages float just above the taskbar, on top of everything */
+.toast{bottom:calc(var(--tb) + 14px);z-index:2147483600;box-shadow:0 6px 18px rgba(110,50,90,.3)}
+body.reading .toast,#readView:fullscreen~.toast{bottom:22px}
 .date{background:var(--bp)}
 .date b,.date span{color:var(--berry)}
 .b-week{background:var(--bp);color:var(--berry);text-shadow:none}
@@ -2742,6 +2745,7 @@ body{will-change:transform;transition:transform .22s ease}`;
   document.addEventListener('fullscreenchange',()=>{
     const rv=$('#readView');
     if(!document.fullscreenElement&&immersive()&&!rv.classList.contains('full')){rv.classList.remove('immersive','ui')}
+    (document.fullscreenElement||document.body).appendChild($('#toast'));     // keep messages visible in full-screen too
     setTimeout(relayout,120);
   });
   // only a real mouse brings the bars back on its own (phones send a fake "mouse moved" after every tap)
