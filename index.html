@@ -209,7 +209,7 @@ body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidd
 .btn.sm{padding:5px 12px;font-size:12.5px}
 
 /* ===== modals (retro windows) ===== */
-.overlay{position:fixed;inset:0;background:rgba(120,70,110,.35);display:none;align-items:flex-start;justify-content:center;padding:40px 14px;overflow:auto;z-index:20}
+.overlay{position:fixed;inset:0;background:rgba(120,70,110,.35);display:none;align-items:flex-start;justify-content:center;padding:40px 14px;overflow:auto;z-index:500}
 .overlay.open{display:flex}
 .modal{background:#fff;border:2px solid var(--dpink);border-radius:8px;width:100%;max-width:660px;box-shadow:6px 8px 0 rgba(217,87,138,.22),0 20px 50px rgba(110,50,90,.25);overflow:hidden}
 .modal>header{padding:5px 6px 5px 12px;background:linear-gradient(90deg,var(--dpink),var(--pink) 55%,#F7A8C9);display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -579,6 +579,41 @@ body.dark .rd-stage{box-shadow:0 0 0 4px #3A2A44,4px 6px 0 4px rgba(0,0,0,.25);b
 .cal-chip.dl{background:var(--lpink);color:var(--dpink);border:1px solid var(--line);cursor:pointer}
 .cal-chip.dl.over{background:#FFD9E0;color:#B4234B}
 .cal-chip.td{background:var(--lav);color:#6E3F88}.cal-chip.hol{background:#FFF1C9;color:#806010}.cal-chip.bd{background:#FFE2CC;color:#A45422}
+.cal-d[data-day]{cursor:pointer;transition:transform .12s,box-shadow .12s}
+.cal-d[data-day]:hover{transform:translateY(-2px);box-shadow:0 4px 0 var(--blush)}
+.cal-nt{font-style:normal;font-size:10px}
+.cal-chip.ev{border:1px solid transparent}
+.t-meeting{background:#DCE8FB;color:#46619F}.t-event{background:var(--bp,#F9C2D7);color:#8A3D68}
+.t-reminder{background:#FFF1C9;color:#806010}.t-personal{background:#D3F3E4;color:#25774F}.t-other{background:var(--lav);color:#6E3F88}
+.cal-chip.nt{background:none;color:var(--mute)}
+/* day window */
+.day-modal{max-width:620px}
+.day-list{display:flex;flex-direction:column;gap:6px}
+.day-item{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:8px;align-items:start;padding:8px 10px;border-radius:10px;border:1.5px solid var(--blush);font-size:13px;color:var(--ink);background:#FFF8FC}
+.day-item>b{font-size:12px;color:var(--dpink)}
+.day-item small{display:block;color:var(--mute);margin-top:2px}
+.day-item .ev-notes{white-space:pre-wrap}
+.day-item .ev-type{font-style:normal;font-size:10.5px;font-weight:700;border-radius:999px;padding:0 7px;margin-left:4px;background:rgba(255,255,255,.6)}
+.day-item.ev{border-left-width:5px;color:#4A3B48}
+.day-item.ev small{color:#6E6870}.day-item.ev a{color:#B03D6C}
+.day-item.t-meeting{border-color:#A9C1F0}.day-item.t-event{border-color:#F2A6C5}.day-item.t-reminder{border-color:#F2D27A}.day-item.t-personal{border-color:#9ED9BC}.day-item.t-other{border-color:var(--dlav)}
+.day-item .done{text-decoration:line-through;color:var(--mute)}
+.day-item a{color:var(--dpink);font-weight:700}
+.day-btns{display:flex;gap:4px}
+.day-btns button{border:1px solid var(--line);background:#fff;color:var(--dpink);border-radius:6px;padding:1px 7px;font-size:11px}
+.day-form{display:grid;gap:8px;background:#FFF8FC;border:1.5px dashed var(--line);border-radius:12px;padding:10px 12px}
+.day-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;font-weight:700;color:var(--mute)}
+.day-row label{display:flex;gap:6px;align-items:center}
+.day-form input,.day-form select,.day-form textarea{border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;background:#fff;color:var(--ink);font-size:13px}
+#evTitle{flex:1 1 220px}#evPlace{flex:1 1 180px}
+#evNotes{min-height:54px;resize:vertical}
+#dayNote{min-height:110px}
+body.dark :is(.day-item,.day-form){background:#251E2F}
+body.dark :is(.day-form input,.day-form select,.day-form textarea,.day-btns button){background:#1F1828;color:var(--ink)}
+body.dark .day-item{color:#F3E6F0}
+body.dark .day-item.ev small{color:#B9AEC0}body.dark .day-item.ev a{color:#FFB3D1}
+body.dark .day-item .ev-type{background:rgba(255,255,255,.14);color:#F3E6F0}
+@media(max-width:600px){.day-item{grid-template-columns:1fr auto}.day-item>b{grid-column:1/-1}}
 .cal-legend{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0 16px}
 .cal-legend .cal-chip{display:inline-block}
 .wk-2col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;max-width:1000px;margin:0 auto}
@@ -1108,7 +1143,6 @@ body.reading .toast,#readView:fullscreen~.toast{bottom:22px}
     <button class="nav-ico" data-app="home"><span class="ni" data-px="home"></span><span class="nl">Home</span></button>
     <button class="nav-ico" data-app="about"><span class="ni" data-px="about"></span><span class="nl">About</span></button>
     <button class="nav-ico" data-app="links"><span class="ni" data-px="links"></span><span class="nl">Quick Links</span></button>
-    <button class="nav-ico" data-app="deadlines"><span class="ni" data-px="deadlines"></span><span class="nl">Deadlines</span></button>
     <button class="nav-ico" data-app="work"><span class="ni" data-px="work"></span><span class="nl">Work</span></button>
     <button class="nav-ico" data-app="notes"><span class="ni" data-px="notes"></span><span class="nl">Notes</span></button>
     <button class="nav-ico" data-app="books"><span class="ni" data-px="books"></span><span class="nl">Books</span></button>
@@ -1327,14 +1361,23 @@ body.reading .toast,#readView:fullscreen~.toast{bottom:22px}
   </div></div>
 </section>
 
-<section class="win" id="win-deadlines" hidden aria-label="Deadlines">
-  <header class="win-bar"><span class="win-t"><i data-px="deadlines"></i>Deadlines</span><span class="win-btns"><button data-win="min" title="Minimize" aria-label="Minimize">_</button><button data-win="max" title="Restore down" aria-label="Restore down">□</button><button data-win="close" title="Close" aria-label="Close">✕</button></span></header>
-  <div class="win-body w98"><div class="win-inner wide">
-    <div class="dl-grid">
-      <div class="dl-main">
-<section class="page" id="page-deadlines">
-      <div class="pill-h">Deadlines</div>
-      <div class="stars" aria-hidden="true"></div>
+
+
+<section class="win" id="win-work" hidden aria-label="Work">
+  <header class="win-bar"><span class="win-t"><i data-px="work"></i>Work</span><span class="win-btns"><button data-win="min" title="Minimize" aria-label="Minimize">_</button><button data-win="max" title="Restore down" aria-label="Restore down">□</button><button data-win="close" title="Close" aria-label="Close">✕</button></span></header>
+  <div class="win-body w98"><div class="win-inner wide wk">
+    <div class="pill-h">Work</div>
+    <div class="stars" aria-hidden="true"></div>
+    <div class="wk-tabs" role="tablist">
+      <button class="wk-tab on" data-wtab="dl">📅 Deadlines</button>
+      <button class="wk-tab" data-wtab="todo">✓ To-Do</button>
+      <button class="wk-tab" data-wtab="codes"># Control Codes</button>
+      <button class="wk-tab" data-wtab="tpl">✉ Templates</button>
+      <button class="wk-tab" data-wtab="cal">▦ Calendar</button>
+    </div>
+
+    <!-- Deadlines (tracker) -->
+    <div class="wk-pane" id="wk-dl"><section class="page" id="page-deadlines">
       <div class="toolbar">
         <button class="btn sm edit-only" id="bAdd" title="Add a deadline">+ Add deadline</button>
         <button class="btn soft sm edit-only" id="bGen" title="Generate dates">Generate dates</button>
@@ -1360,26 +1403,10 @@ body.reading .toast,#readView:fullscreen~.toast{bottom:22px}
       <div id="list"></div>
       <div class="stars" aria-hidden="true"></div>
       <p class="foot">Reminders go out by email at about 8 AM Manila time, at each item's set intervals (default: 30, 14 and 7 days before). Overdue items are repeated every Monday. ♡</p>
-    </section>
-      </div>
-    </div>
-  </div></div>
-</section>
-
-<section class="win" id="win-work" hidden aria-label="Work">
-  <header class="win-bar"><span class="win-t"><i data-px="work"></i>Work</span><span class="win-btns"><button data-win="min" title="Minimize" aria-label="Minimize">_</button><button data-win="max" title="Restore down" aria-label="Restore down">□</button><button data-win="close" title="Close" aria-label="Close">✕</button></span></header>
-  <div class="win-body w98"><div class="win-inner wide wk">
-    <div class="pill-h">Work</div>
-    <div class="stars" aria-hidden="true"></div>
-    <div class="wk-tabs" role="tablist">
-      <button class="wk-tab on" data-wtab="todo">✓ To-Do</button>
-      <button class="wk-tab" data-wtab="codes"># Control Codes</button>
-      <button class="wk-tab" data-wtab="tpl">✉ Templates</button>
-      <button class="wk-tab" data-wtab="cal">▦ Calendar</button>
-    </div>
+    </section></div>
 
     <!-- To-Do board -->
-    <div class="wk-pane" id="wk-todo">
+    <div class="wk-pane" id="wk-todo" hidden>
       <form class="td-add" id="tdForm">
         <input id="tdText" placeholder="New task… e.g. Send renewal notice to Client A" aria-label="New task">
         <select id="tdPri" aria-label="Priority"><option value="normal">Normal</option><option value="high">★ High</option><option value="low">Low</option></select>
@@ -1443,9 +1470,10 @@ body.reading .toast,#readView:fullscreen~.toast{bottom:22px}
 
     <!-- Calendar + working days -->
     <div class="wk-pane" id="wk-cal" hidden>
-      <div class="cal-top"><button class="btn soft sm" id="calPrev" aria-label="Previous month">‹</button><b id="calTitle"></b><button class="btn soft sm" id="calNext" aria-label="Next month">›</button><button class="btn soft sm" id="calToday">Today</button></div>
+      <div class="cal-top"><button class="btn soft sm" id="calPrev" aria-label="Previous month">‹</button><b id="calTitle"></b><button class="btn soft sm" id="calNext" aria-label="Next month">›</button><button class="btn soft sm" id="calToday">Today</button><button class="btn sm" id="calAdd">+ Add event</button></div>
+      <p class="page-note">click any day to see everything on it, add events and write notes ♡</p>
       <div class="cal-grid" id="calGrid"></div>
-      <div class="cal-legend"><span class="cal-chip dl">deadline</span><span class="cal-chip td">task</span><span class="cal-chip hol">holiday</span><span class="cal-chip bd">🎂 birthday</span></div>
+      <div class="cal-legend"><span class="cal-chip ev t-meeting">meeting</span><span class="cal-chip ev t-event">event</span><span class="cal-chip ev t-reminder">reminder</span><span class="cal-chip ev t-personal">personal</span><span class="cal-chip dl">deadline</span><span class="cal-chip td">task</span><span class="cal-chip hol">holiday</span><span class="cal-chip bd">🎂 birthday</span><span class="cal-chip nt">📝 note</span></div>
       <div class="wk-2col">
         <div class="w-card">
           <h4 class="w-h">✦ working days calculator ✦</h4>
@@ -1555,7 +1583,6 @@ body.reading .toast,#readView:fullscreen~.toast{bottom:22px}
   <div class="sm-list">
     <button data-app="about"><i data-px="about"></i>About Me</button>
     <button data-app="links"><i data-px="links"></i>Quick Links</button>
-    <button data-app="deadlines"><i data-px="deadlines"></i>Deadlines</button>
     <button data-app="work"><i data-px="work"></i>Work</button>
     <button data-app="notes"><i data-px="notes"></i>Notes</button>
     <button data-app="books"><i data-px="books"></i>Books</button>
@@ -1572,6 +1599,35 @@ body.reading .toast,#readView:fullscreen~.toast{bottom:22px}
     <div class="tb-clock"><b id="tbTime">--:--</b><span id="tbDate"></span></div>
   </div>
 </footer>
+
+<!-- A day in the calendar: everything on it, events, notes -->
+<div class="overlay" id="mDay"><div class="modal day-modal">
+  <header><h2 id="dayTitle">Day</h2><span class="winbtns"><i>_</i><i>□</i><button class="x" data-close aria-label="Close">✕</button></span></header>
+  <div class="mbody">
+    <div class="full day-list" id="dayList"></div>
+    <div class="full day-form" id="dayForm">
+      <h4 class="w-h" id="dayFormTitle">✦ add an event ✦</h4>
+      <div class="day-row">
+        <input id="evTitle" placeholder="What? e.g. Meeting with Client A" aria-label="Event title">
+        <select id="evType" aria-label="Type"><option value="meeting">Meeting</option><option value="event">Event</option><option value="reminder">Reminder</option><option value="personal">Personal</option><option value="other">Other</option></select>
+      </div>
+      <div class="day-row">
+        <label>from <input type="time" id="evTime" aria-label="Start time"></label>
+        <label>to <input type="time" id="evEnd" aria-label="End time"></label>
+        <input id="evPlace" placeholder="Where / link (optional)" aria-label="Place">
+      </div>
+      <textarea id="evNotes" placeholder="Details (optional)" aria-label="Event details"></textarea>
+      <div class="day-row"><button class="btn sm" id="evSave">+ Add event</button><button class="btn soft sm" id="evCancel" hidden>Cancel</button></div>
+    </div>
+    <label class="f full">📝 Notes for this day
+      <textarea id="dayNote" placeholder="Anything about this day… (saves by itself)"></textarea>
+    </label>
+  </div>
+  <footer>
+    <div><button class="btn soft sm" id="dayPrev">‹ Previous day</button><button class="btn soft sm" id="dayNext">Next day ›</button></div>
+    <div><button class="btn primary" data-close>Done</button></div>
+  </footer>
+</div></div>
 
 <!-- Add / edit -->
 <div class="overlay" id="mForm"><div class="modal">
@@ -2141,7 +2197,7 @@ PX.fill();
 })();
 /* --- desktop: windows, taskbar, start menu --- */
 const WM=(()=>{
-  const APPS={about:['🎀','About Me'],links:['🔗','Quick Links'],deadlines:['📅','Deadlines'],work:['💼','Work'],notes:['📝','Notes'],books:['📚','Books']};
+  const APPS={about:['🎀','About Me'],links:['🔗','Quick Links'],work:['💼','Work'],notes:['📝','Notes'],books:['📚','Books']};
   let z=10, order=[];                                   // order = open (or minimized) apps, for the taskbar
   const win=id=>$('#win-'+id);
   const visible=()=>order.filter(id=>!win(id).hidden);
@@ -2160,6 +2216,7 @@ const WM=(()=>{
   function open(id){
     if(OWNER_APPS.includes(id)&&!Owner.isOwner()){ toast("That one's just for Rhoda ♡"); return }
     if(id==='settings'){ $('#bSettings').onclick(); return }
+    if(id==='deadlines'){ open('work'); Work.showTab('dl'); return }              // Deadlines lives in the Work app now
     if(id==='desktop'||id==='home'){ showDesktop(); return }
     const w=win(id); if(!w) return;
     const was=w.hidden; w.hidden=false; place(w);
@@ -2211,7 +2268,7 @@ const WM=(()=>{
   $('#trayMusic').onclick=()=>showDesktop();             // the music player lives on the home screen
   addEventListener('hashchange',()=>{const h=location.hash.slice(1); if(APPS[h]&&(win(h).hidden||h!==top())) open(h); else if(h==='home') showDesktop()});
 
-  return {open,close,showDesktop,start(){const h=location.hash.slice(1); if(APPS[h]) open(h); else {bar(); setHash()}}};
+  return {open,close,showDesktop,start(){const h=location.hash.slice(1); if(APPS[h]||h==='deadlines') open(h); else {bar(); setHash()}}};
 })();
 const showPage=p=>WM.open(p);                            // older buttons (e.g. "open tracker") still work
 
@@ -3121,8 +3178,8 @@ const Work=(()=>{
   async function copyText(t){try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove()}}
 
   /* tabs */
-  let tab='todo';
-  function showTab(t){tab=t; $$('.wk-tab').forEach(b=>b.classList.toggle('on',b.dataset.wtab===t)); $$('.wk-pane').forEach(p=>p.hidden=p.id!=='wk-'+t); ({todo:renderTodo,codes:renderCodes,tpl:renderTpl,cal:renderCal})[t]()}
+  let tab='dl';
+  function showTab(t){tab=t; $$('.wk-tab').forEach(b=>b.classList.toggle('on',b.dataset.wtab===t)); $$('.wk-pane').forEach(p=>p.hidden=p.id!=='wk-'+t); ({dl:()=>{},todo:renderTodo,codes:renderCodes,tpl:renderTpl,cal:renderCal})[t]()}
   $$('.wk-tab').forEach(b=>b.onclick=()=>showTab(b.dataset.wtab));
 
   /* ---- To-Do board ---- */
@@ -3327,8 +3384,10 @@ const Work=(()=>{
       const dls=items.filter(it=>it.dueDate===s&&it.status==='Active');
       const tds=todos.filter(x=>x.due===s&&x.col!=='done');
       const bd=m===PROFILE.birthday.month&&d===PROFILE.birthday.day;
-      h+=`<div class="cal-d ${w===0||w===6?'we':''} ${s===t?'today':''}"><span class="n">${d}</span>
+      const evs=eventsOn(s), note=(NOTES[s]||'').trim();
+      h+=`<div class="cal-d ${w===0||w===6?'we':''} ${s===t?'today':''}" data-day="${s}" role="button" tabindex="0" aria-label="${esc(longD(s))}"><span class="n">${d}${note?' <i class="cal-nt" title="has a note">📝</i>':''}</span>
         ${hol?`<span class="cal-chip hol" title="${esc(hol)}">${esc(hol)}</span>`:''}${bd?'<span class="cal-chip bd">🎂 birthday</span>':''}
+        ${evs.map(e=>`<span class="cal-chip ev t-${e.type}" title="${esc((e.time?fmtT(e.time)+' ':'')+e.title)}">${e.time?fmtT(e.time)+' ':''}${esc(e.title)}</span>`).join('')}
         ${dls.map(it=>`<a href="#" class="cal-chip dl ${s<t?'over':''}" data-edit="${esc(it.id)}" title="${esc(it.title)}">${esc(it.title)}</a>`).join('')}
         ${tds.map(x=>`<span class="cal-chip td" title="${esc(x.text)}">✓ ${esc(x.text)}</span>`).join('')}</div>`;
     }
@@ -3341,6 +3400,52 @@ const Work=(()=>{
   $('#calPrev').onclick=()=>{const [y,m]=calM.split('-').map(Number); calM=ymd(new Date(y,m-2,1)).slice(0,7); renderCal()};
   $('#calNext').onclick=()=>{const [y,m]=calM.split('-').map(Number); calM=ymd(new Date(y,m,1)).slice(0,7); renderCal()};
   $('#calToday').onclick=()=>{calM=today().slice(0,7); renderCal()};
+
+  /* ---- events + day notes (click a day to open it) ---- */
+  let EVENTS=lsGet('rhoda_work_events',[]), NOTES=lsGet('rhoda_work_daynotes',{}), dayOpen=null, evEditing=null, noteT;
+  const saveEv=()=>lsSet('rhoda_work_events',EVENTS);
+  const TYPES_EV={meeting:'Meeting',event:'Event',reminder:'Reminder',personal:'Personal',other:'Other'};
+  function fmtT(t){if(!/^\d{2}:\d{2}$/.test(t||'')) return ''; const [h,mi]=t.split(':').map(Number); return (h%12||12)+(mi?':'+String(mi).padStart(2,'0'):'')+(h<12?'am':'pm')}
+  const eventsOn=s=>EVENTS.filter(e=>e.date===s).sort((a,b)=>(a.time||'99').localeCompare(b.time||'99'));
+  function openDay(s){
+    if(!isDate(s)) s=today(); dayOpen=s; resetForm();
+    $('#dayNote').value=NOTES[s]||''; renderDay(); open('#mDay');
+  }
+  function renderDay(){
+    const s=dayOpen, d=parse(s), hol=holOn(s), t=today();
+    $('#dayTitle').textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+(s===t?' · today':'');
+    const rows=[];
+    if(hol) rows.push(`<div class="day-item hol"><b>✿ Holiday</b><span>${esc(hol)}</span></div>`);
+    if(d.getMonth()+1===PROFILE.birthday.month&&d.getDate()===PROFILE.birthday.day) rows.push('<div class="day-item bd"><b>🎂 Birthday</b><span>Happy birthday, '+esc(PROFILE.name)+'! ♡</span></div>');
+    eventsOn(s).forEach(e=>rows.push(`<div class="day-item ev t-${e.type}"><b>${e.time?fmtT(e.time)+(e.end?'–'+fmtT(e.end):''):'all day'}</b>
+      <span><strong>${esc(e.title)}</strong> <em class="ev-type">${TYPES_EV[e.type]||'Other'}</em>${e.place?`<small>📍 ${/^https?:\/\//i.test(e.place)?`<a href="${esc(e.place)}" target="_blank" rel="noopener">${esc(e.place)}</a>`:esc(e.place)}</small>`:''}${e.notes?`<small class="ev-notes">${esc(e.notes)}</small>`:''}</span>
+      <span class="day-btns"><button data-evedit="${esc(e.id)}" title="Edit" aria-label="Edit event">✎</button><button data-evdel="${esc(e.id)}" title="Delete" aria-label="Delete event">✕</button></span></div>`));
+    items.filter(it=>it.dueDate===s).forEach(it=>rows.push(`<div class="day-item dl"><b>📅 Deadline</b><span><a href="#" data-edit="${esc(it.id)}">${esc(it.title)}</a> ${badge(it)}</span></div>`));
+    todos.filter(x=>x.due===s).forEach(x=>rows.push(`<div class="day-item td"><b>✓ Task</b><span${x.col==='done'?' class="done"':''}>${esc(x.text)}</span></div>`));
+    $('#dayList').innerHTML=rows.join('')||'<p class="td-empty">nothing on this day yet ♡ add an event below</p>';
+  }
+  function resetForm(){evEditing=null; ['#evTitle','#evTime','#evEnd','#evPlace','#evNotes'].forEach(x=>$(x).value=''); $('#evType').value='meeting'; $('#evSave').textContent='+ Add event'; $('#evCancel').hidden=true; $('#dayFormTitle').textContent='✦ add an event ✦'}
+  $('#evSave').onclick=()=>{
+    const title=$('#evTitle').value.trim(); if(!title){toast('Type what the event is ♡'); $('#evTitle').focus(); return}
+    const data={title,type:$('#evType').value,time:$('#evTime').value,end:$('#evEnd').value,place:$('#evPlace').value.trim(),notes:$('#evNotes').value.trim()};
+    if(evEditing){Object.assign(EVENTS.find(e=>e.id===evEditing)||{},data); toast('Event updated ♡')}
+    else {EVENTS.push({id:wid(),date:dayOpen,...data}); toast('Event added ♡')}
+    saveEv(); resetForm(); renderDay(); renderCal();
+  };
+  $('#evCancel').onclick=resetForm;
+  $('#dayList').addEventListener('click',e=>{
+    const ed=e.target.closest('[data-evedit]'), del=e.target.closest('[data-evdel]');
+    if(ed){const v=EVENTS.find(x=>x.id===ed.dataset.evedit); if(!v) return; evEditing=v.id;
+      $('#evTitle').value=v.title; $('#evType').value=v.type; $('#evTime').value=v.time||''; $('#evEnd').value=v.end||''; $('#evPlace').value=v.place||''; $('#evNotes').value=v.notes||'';
+      $('#evSave').textContent='Save changes'; $('#evCancel').hidden=false; $('#dayFormTitle').textContent='✦ edit event ✦'; $('#evTitle').focus()}
+    if(del){const v=EVENTS.find(x=>x.id===del.dataset.evdel); if(v&&confirm('Delete "'+v.title+'"?')){EVENTS=EVENTS.filter(x=>x!==v); saveEv(); if(evEditing===v.id) resetForm(); renderDay(); renderCal(); toast('Event deleted')}}
+  });
+  $('#dayNote').addEventListener('input',()=>{clearTimeout(noteT); noteT=setTimeout(()=>{const v=$('#dayNote').value; if(v.trim()) NOTES[dayOpen]=v; else delete NOTES[dayOpen]; lsSet('rhoda_work_daynotes',NOTES); renderCal()},400)});
+  const goDay=n=>{clearTimeout(noteT); const v=$('#dayNote').value; if(v.trim()) NOTES[dayOpen]=v; else delete NOTES[dayOpen]; lsSet('rhoda_work_daynotes',NOTES); openDay(addDays(dayOpen,n)); calM=dayOpen.slice(0,7); renderCal()};
+  $('#dayPrev').onclick=()=>goDay(-1); $('#dayNext').onclick=()=>goDay(1);
+  $('#calAdd').onclick=()=>{openDay(today()); setTimeout(()=>$('#evTitle').focus(),60)};
+  $('#calGrid').addEventListener('click',e=>{if(e.target.closest('[data-edit]')) return; const c=e.target.closest('[data-day]'); if(c) openDay(c.dataset.day)});
+  $('#calGrid').addEventListener('keydown',e=>{const c=e.target.closest('[data-day]'); if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault(); openDay(c.dataset.day)}});
   $('#holAdd').onclick=()=>{const d=$('#holDate').value, n=$('#holName').value.trim(); if(!isDate(d)||!n){toast('Pick a date and type the holiday name'); return}
     HOL.custom.push({id:wid(),date:d,name:n}); saveHol(); $('#holName').value=''; calM=d.slice(0,7); renderCal(); toast('Holiday added ♡')};
   $('#holList').addEventListener('click',e=>{
@@ -3355,6 +3460,7 @@ const Work=(()=>{
 
   return {
     show(){showTab(tab)},
+    showTab(t){showTab(t)},
     refresh(){if($('#win-work').hidden) return; if(tab==='todo') renderTodo(); if(tab==='cal') renderCal()},
     _addWork:addWork, _count:countWork, _hol:y=>holList(y)
   };
