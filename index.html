@@ -2494,7 +2494,13 @@ const Reader=(()=>{
     for(const g of Object.keys(groups)) if(groups[g].length<2&&!groups[g].some(b=>b.folder||b.pubFolder)) delete groups[g];
     // its number in the folder: the one you set, or the book's own series number when the folder is that series
     const numOf=b=>b.libN||(b.series&&b.series===groupOf(b)?b.seriesIndex:0)||0;
-    const inOrder=(a,b)=>numOf(a)-numOf(b)||String(a.pub||a.title).localeCompare(String(b.pub||b.title),undefined,{numeric:true});
+    // order in a folder: numbers you set first, then the order books were uploaded/added (oldest = #1), then by name
+    const upOf=b=>b.pub?(b.upT||0):(b.added||0);
+    const inOrder=(a,b)=>{
+      const n=numOf(a)-numOf(b); if(n) return n;
+      const ta=upOf(a), tb=upOf(b); if(ta&&tb&&ta!==tb) return ta-tb;
+      return String(a.pub||a.title).localeCompare(String(b.pub||b.title),undefined,{numeric:true});
+    };
     const head=$('#shelfHead');
     if(folder&&groups[folder]){
       const list=groups[folder].sort(inOrder);
@@ -2520,7 +2526,9 @@ const Reader=(()=>{
   let LIB={books:{}}, libSha='';
   {const c=lsGet('rhoda_shared_library',null); if(c&&c.data){LIB=c.data; libSha=c.sha||''}}
   if(!LIB.books) LIB.books={};
-  const libProps=url=>{const e=LIB.books[url]; return e?{pubFolder:e.folder||'',noFolder:!e.folder,libN:+e.n||0}:{pubFolder:folderFromPath(url),noFolder:false,libN:0}};
+  // folder, number and upload time saved online for each shared book ("folder" only counts if it was set on purpose)
+  const libProps=url=>{const e=LIB.books[url]||{}, has='folder' in e;
+    return {pubFolder:has?(e.folder||''):folderFromPath(url),noFolder:has&&!e.folder,libN:+e.n||0,upT:+e.t||0}};
   const fileURL=p=>/\.github\.io$/i.test(location.hostname)||!Owner.repo()?encPath(p):`https://raw.githubusercontent.com/${Owner.repo()}/HEAD/${encPath(p)}`;
   async function publicBookList(){
     const list=PUBLIC_BOOKS.map(url=>({url,sha:'',folder:folderFromPath(url)}));
@@ -2549,7 +2557,7 @@ const Reader=(()=>{
     for(const it of list){
       const have=pubs.find(b=>b.pub===it.url);
       if(have&&(!it.sha||have.sha===it.sha)){                                       // same file: just refresh its folder
-        const lp=libProps(it.url); if(have.pubFolder!==lp.pubFolder||!!have.noFolder!==lp.noFolder||(have.libN||0)!==lp.libN){Object.assign(have,lp); await putBook(have)}
+        const lp=libProps(it.url); if(have.pubFolder!==lp.pubFolder||!!have.noFolder!==lp.noFolder||(have.libN||0)!==lp.libN||(have.upT||0)!==lp.upT){Object.assign(have,lp); await putBook(have)}
         continue;
       }
       try{
@@ -2580,9 +2588,9 @@ const Reader=(()=>{
         try{await Owner.api('/contents/'+encPath(path)); path='books/'+name.replace(/\.epub$/i,'')+' '+Date.now().toString(36)+'.epub'}catch(e){if(e.status!==404) throw e}
         toast('Uploading "'+fields.title+'"…');
         const r=await Owner.api('/contents/'+encPath(path),{method:'PUT',body:JSON.stringify({message:'Add book: '+fields.title,content:await fileB64(f)})});
-        if(folder) LIB.books[path]={folder,n:0};                                 // added while a folder is open → goes in that folder
+        LIB.books[path]=Object.assign({t:Date.now()},folder?{folder,n:0}:{});  // remember when it was uploaded (for #1, #2, #3…); a folder open → goes in it
         await putBook({id:'P-'+path,pub:path,sha:r.content.sha,added:Date.now(),file:f,...fields,...libProps(path)});
-        if(folder) await saveLib('Add "'+fields.title+'" to '+folder);
+        await saveLib('Add "'+fields.title+'"'+(folder?' to '+folder:''));
         toast('Shared "'+fields.title+'" ♡ everyone can see it in about a minute');
       }catch(e){toast("Couldn't upload "+f.name+': '+e.message)}
       await renderShelf();
@@ -2820,7 +2828,7 @@ body{will-change:transform;transition:transform .22s ease}`;
       const nn=prompt('New name for the folder "'+folder+'":',folder); if(!nn||!nn.trim()||nn.trim()===folder) return;
       const name=nn.trim(), list=(await allBooks()).filter(b=>groupOf(b)===folder); let shared=false;
       for(const b of list){
-        if(b.pub){ if(!Owner.canWrite()) continue; LIB.books[b.pub]={folder:name,n:b.libN||b.seriesIndex||0}; Object.assign(b,libProps(b.pub)); shared=true }
+        if(b.pub){ if(!Owner.canWrite()) continue; LIB.books[b.pub]=Object.assign(LIB.books[b.pub]||{},{folder:name,n:b.libN||0}); Object.assign(b,libProps(b.pub)); shared=true }
         else {b.folder=name; b.noFolder=false}
         await putBook(b);
       }
@@ -2839,7 +2847,7 @@ body{will-change:transform;transition:transform .22s ease}`;
       const {name,n}=parseFolder(ans);
       if(b.pub){
         if(!Owner.canWrite()) return;
-        LIB.books[b.pub]={folder:name,n}; Object.assign(b,libProps(b.pub)); await putBook(b); renderShelf();
+        LIB.books[b.pub]=Object.assign(LIB.books[b.pub]||{},{folder:name,n}); Object.assign(b,libProps(b.pub)); await putBook(b); renderShelf();
         try{await saveLib('Organize "'+b.title+'"'); toast((name?'Moved to 📁 '+name:'Taken out of its folder')+' · saved for all devices ♡')}catch(err){toast("Couldn't save to GitHub: "+err.message)}
       }else{
         b.folder=name; b.noFolder=!name; b.libN=n; await putBook(b);
