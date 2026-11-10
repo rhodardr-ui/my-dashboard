@@ -2718,7 +2718,8 @@ body{will-change:transform;transition:transform .22s ease}`;
       $('#libView').hidden=true; $('#readView').hidden=false; $('#win-books .win-body').scrollTop=0;
       sizeStage(); const p=pos(id); busy=true;
       try{await loadChapter(p.ch||0,{frac:p.frac||0})}finally{busy=false}
-      requestAnimationFrame(relayout);
+      if(innerWidth<=900||matchMedia('(pointer: coarse)').matches) enterRead();   // phones: books always open full-screen
+      else requestAnimationFrame(relayout);
     }catch(e){toast("Couldn't open this book: "+e.message); close()}
   }
   /* full-screen reading: just the book; controls fade in when you move the mouse */
@@ -2743,7 +2744,9 @@ body{will-change:transform;transition:transform .22s ease}`;
     if(!document.fullscreenElement&&immersive()&&!rv.classList.contains('full')){rv.classList.remove('immersive','ui')}
     setTimeout(relayout,120);
   });
-  $('#readView').addEventListener('mousemove',showUI);
+  // only a real mouse brings the bars back on its own (phones send a fake "mouse moved" after every tap)
+  const mouseShow=e=>{if(e.pointerType==='mouse') showUI()};
+  $('#readView').addEventListener('pointermove',mouseShow);
 
   function close(){
     exitRead(); $('#readView').hidden=true; $('#libView').hidden=false;
@@ -2793,7 +2796,7 @@ body{will-change:transform;transition:transform .22s ease}`;
       tapAt(e.clientX);
     });
     idoc.addEventListener('keydown',onKey);
-    idoc.addEventListener('mousemove',showUI);
+    idoc.addEventListener('pointermove',mouseShow);
     idoc.addEventListener('wheel',e=>{const now=Date.now(); if(now-wheelT<450) return; wheelT=now; (e.deltaY>0||e.deltaX>0)?next():prev()},{passive:true});
   }
 
@@ -2877,7 +2880,7 @@ body{will-change:transform;transition:transform .22s ease}`;
       if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)) (dx<0?next():prev());           // swipe
       else if(Math.abs(dx)<15&&Math.abs(dy)<15&&Date.now()-st<600) (+z.dataset.zone>0?next():prev());   // tap
       else return;
-      z.classList.add('flash'); setTimeout(()=>z.classList.remove('flash'),180); showUI();
+      z.classList.add('flash'); setTimeout(()=>z.classList.remove('flash'),180);   // turning a page keeps full-screen clean (no bars)
     });
     z.addEventListener('pointercancel',()=>{down=false});
     z.addEventListener('click',e=>e.preventDefault());
