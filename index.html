@@ -449,6 +449,29 @@ label.f textarea{min-height:64px;resize:vertical}
 .rd-foot span{font-size:12px;font-weight:700;color:var(--dpink);white-space:nowrap}
 #readView.full{position:fixed;inset:0;z-index:40;background:#FBE6F6;padding:12px 16px;display:flex;flex-direction:column}
 #readView.full .rd-stage{flex:1;height:auto!important}
+/* full-screen reading: only the book, controls appear on mouse move */
+#readView.immersive{position:fixed;inset:0;z-index:2147483000;padding:0;display:flex;flex-direction:column;background:var(--readbg,#2B2234)}
+#readView:fullscreen{position:fixed;inset:0;padding:0;background:var(--readbg,#2B2234)}
+#readView.immersive .rd-stage{flex:1;height:auto!important;border:0;border-radius:0;box-shadow:none}
+#readView.immersive :is(.rd-bar,.rd-foot){position:absolute;left:0;right:0;z-index:5;margin:0;padding:10px 18px;opacity:0;pointer-events:none;transition:opacity .25s;
+  background:rgba(255,240,246,.95);box-shadow:0 2px 14px rgba(0,0,0,.15)}
+body.dark #readView.immersive :is(.rd-bar,.rd-foot){background:rgba(38,30,48,.95)}
+#readView.immersive .rd-bar{top:0}
+#readView.immersive .rd-foot{bottom:0}
+#readView.immersive.ui :is(.rd-bar,.rd-foot){opacity:1;pointer-events:auto}
+#readView.immersive .rd-arrow{opacity:0;transition:opacity .25s}
+#readView.immersive.ui .rd-arrow{opacity:.55}
+body.reading .taskbar{display:none}
+body.dark .rd-stage{box-shadow:0 0 0 4px #3A2A44,4px 6px 0 4px rgba(0,0,0,.25);border-color:#5E3A58}
+/* reader on phones */
+@media(max-width:600px){
+  .rd-bar{gap:6px}
+  .rd-title{flex:1 1 100%}
+  #rdToc{flex:1 1 100%;max-width:none}
+  .rd-ctl{width:100%;justify-content:space-between}
+  .rd-arrow{display:none}
+  #readView.immersive :is(.rd-bar,.rd-foot){padding:8px 10px}
+}
 
 /* ===== Work app ===== */
 .wk input:not([type=checkbox]),.wk select,.wk textarea{border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;background:#FFF8FC;color:var(--ink);font-size:13px;max-width:100%}
@@ -2564,11 +2587,12 @@ ${prefs.theme==='night'?'body *{color:inherit!important;background-color:transpa
 img,svg,video{max-width:100%!important;max-height:${Math.max(80,H-2*P)}px!important;object-fit:contain;break-inside:avoid}
 img{height:auto}
 a{color:#D9578A}
-::selection{background:#F9C9DD}`;
+::selection{background:#F9C9DD}
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}`;
   }
   function measure(){
     const f=$('#rdFrame'); W=f.clientWidth; H=f.clientHeight; P=W<520?18:Math.round(Math.min(48,W*.06));
-    f.style.background=(THEMES[prefs.theme]||THEMES.paper)[0];
+    f.style.background=(THEMES[prefs.theme]||THEMES.paper)[0]; $('#readView').style.setProperty('--readbg',f.style.background);
     idoc.getElementById('rd').textContent=readerCSS();
   }
   const countPages=()=>{pages=Math.max(1,Math.ceil((idoc.scrollingElement.scrollWidth-P)/Math.max(1,W)-0.001))};
@@ -2646,10 +2670,9 @@ a{color:#D9578A}
 
   function sizeStage(){
     const st=$('.rd-stage'), rv=$('#readView');
-    if(rv.classList.contains('full')){st.style.height=''; return}
-    if(innerWidth<900){st.style.height=Math.round(innerHeight*.72)+'px'; return}
+    if(rv.classList.contains('full')||rv.classList.contains('immersive')){st.style.height=''; return}
     const sb=st.closest('.win-body'), top=st.getBoundingClientRect().top-sb.getBoundingClientRect().top+sb.scrollTop;
-    st.style.height=Math.max(320,sb.clientHeight-top-92)+'px';
+    st.style.height=Math.max(innerWidth<600?260:320,sb.clientHeight-top-(innerWidth<600?70:92))+'px';
   }
 
   async function open(id){
@@ -2665,8 +2688,32 @@ a{color:#D9578A}
       requestAnimationFrame(relayout);
     }catch(e){toast("Couldn't open this book: "+e.message); close()}
   }
+  /* full-screen reading: just the book; controls fade in when you move the mouse */
+  let uiT;
+  const immersive=()=>$('#readView').classList.contains('immersive');
+  function showUI(){const rv=$('#readView'); if(!immersive()) return; rv.classList.add('ui'); clearTimeout(uiT); uiT=setTimeout(()=>rv.classList.remove('ui'),2600)}
+  function enterRead(){
+    const rv=$('#readView'), bg=(THEMES[prefs.theme]||THEMES.paper)[0];
+    rv.classList.add('immersive'); rv.style.setProperty('--readbg',bg);
+    const fallback=()=>{rv.classList.add('full'); document.body.classList.add('reading')};
+    if(rv.requestFullscreen) rv.requestFullscreen().catch(fallback); else fallback();
+    showUI(); setTimeout(relayout,120);
+  }
+  function exitRead(){
+    const rv=$('#readView');
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    rv.classList.remove('immersive','full','ui'); document.body.classList.remove('reading'); setTimeout(relayout,120);
+  }
+  const toggleRead=()=>immersive()?exitRead():enterRead();
+  document.addEventListener('fullscreenchange',()=>{
+    const rv=$('#readView');
+    if(!document.fullscreenElement&&immersive()&&!rv.classList.contains('full')){rv.classList.remove('immersive','ui')}
+    setTimeout(relayout,120);
+  });
+  $('#readView').addEventListener('mousemove',showUI);
+
   function close(){
-    $('#readView').classList.remove('full'); $('#readView').hidden=true; $('#libView').hidden=false;
+    exitRead(); $('#readView').hidden=true; $('#libView').hidden=false;
     info=null; renderShelf();
   }
   function setPref(k,v){prefs[k]=v; lsSet('rhoda_reader_prefs',prefs); relayout()}
@@ -2676,11 +2723,31 @@ a{color:#D9578A}
     if(e.target&&e.target.closest&&e.target.closest('input,select,textarea')) return;
     if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault(); next()}
     else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault(); prev()}
-    else if(e.key==='Escape'&&$('#readView').classList.contains('full')){$('#readView').classList.remove('full'); setTimeout(relayout,30)}
+    else if(e.key==='Escape'&&immersive()){exitRead()}
+    else if(e.key==='f'||e.key==='F'){e.preventDefault(); toggleRead()}
   }
-  let wheelT=0;
+  let wheelT=0, lastTouch=0;
+  // tap left / right side to turn the page; tap the middle (in full-screen reading) to show or hide the controls
+  function tapAt(x){
+    if(x<W*.3) prev(); else if(x>W*.7) next();
+    else if(immersive()){const rv=$('#readView'); if(rv.classList.contains('ui')){clearTimeout(uiT); rv.classList.remove('ui')} else showUI()}
+  }
   function wireFrame(){
+    // phones: one tap or a swipe turns the page (no double-tap needed)
+    let tx=0,ty=0,tt=0;
+    idoc.addEventListener('touchstart',e=>{const t=e.touches[0]; tx=t.clientX; ty=t.clientY; tt=Date.now()},{passive:true});
+    idoc.addEventListener('touchend',e=>{
+      if(e.touches.length) return;
+      const t=e.changedTouches[0], dx=t.clientX-tx, dy=t.clientY-ty, dt=Date.now()-tt;
+      if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.2&&dt<900){lastTouch=Date.now(); if(e.cancelable) e.preventDefault(); dx<0?next():prev(); return}   // swipe
+      if(Math.abs(dx)<12&&Math.abs(dy)<12&&dt<450){                                                                                          // tap
+        if(e.target.closest&&e.target.closest('a')) return;            // let links work normally
+        if(idoc.getSelection&&String(idoc.getSelection())) return;
+        lastTouch=Date.now(); if(e.cancelable) e.preventDefault(); tapAt(t.clientX);
+      }
+    },{passive:false});
     idoc.addEventListener('click',e=>{
+      if(Date.now()-lastTouch<700&&!(e.target.closest&&e.target.closest('a'))) return;   // already handled by the tap/swipe
       const a=e.target.closest&&e.target.closest('a');
       if(a){
         e.preventDefault();
@@ -2690,9 +2757,10 @@ a{color:#D9578A}
         return;
       }
       if(idoc.getSelection&&String(idoc.getSelection())) return;   // don't turn pages while selecting text
-      if(e.clientX<W*.3) prev(); else if(e.clientX>W*.7) next();
+      tapAt(e.clientX);
     });
     idoc.addEventListener('keydown',onKey);
+    idoc.addEventListener('mousemove',showUI);
     idoc.addEventListener('wheel',e=>{const now=Date.now(); if(now-wheelT<450) return; wheelT=now; (e.deltaY>0||e.deltaX>0)?next():prev()},{passive:true});
   }
 
@@ -2765,7 +2833,7 @@ a{color:#D9578A}
   $('#rdBig').onclick=()=>setPref('fs',Math.min(180,prefs.fs+10));
   $('#rdFont').value=prefs.font; $('#rdFont').onchange=e=>setPref('font',e.target.value);
   $('#rdTheme').value=prefs.theme; $('#rdTheme').onchange=e=>setPref('theme',e.target.value);
-  $('#rdFull').onclick=()=>{$('#readView').classList.toggle('full'); setTimeout(relayout,30)};
+  $('#rdFull').onclick=toggleRead;
   document.addEventListener('keydown',onKey);
   // keep the shared shelf fresh on every device: check GitHub every 2 minutes and whenever you come back to the tab
   let lastSync=Date.now();
