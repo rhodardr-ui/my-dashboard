@@ -475,6 +475,16 @@ body.dark .rd-stage{box-shadow:0 0 0 4px #3A2A44,4px 6px 0 4px rgba(0,0,0,.25);b
   .win.opening{animation:none}
 }
 
+/* touch screens: invisible tap/swipe areas on the left and right of the page (outside the book frame, so every phone gets the touch) */
+.rd-zone{display:none;position:absolute;top:0;bottom:0;width:30%;z-index:3;touch-action:none;-webkit-tap-highlight-color:transparent;background:transparent}
+.rd-zone.l{left:0}.rd-zone.r{right:0}
+.rd-zone.flash{background:linear-gradient(90deg,rgba(249,194,215,.25),transparent)}
+.rd-zone.r.flash{background:linear-gradient(270deg,rgba(249,194,215,.25),transparent)}
+@media(pointer:coarse),(max-width:900px){
+  .rd-zone{display:block}
+  #win-books .win-body:has(#readView:not([hidden])){overflow:hidden;overscroll-behavior:none}   /* reading: nothing scrolls under your finger */
+}
+
 /* reader on phones */
 @media(max-width:600px){
   .rd-bar{gap:6px}
@@ -1519,6 +1529,8 @@ body.dark{--pink:#F7AECB;--dpink:#F5A3C4}
         <div class="rd-stage">
           <button class="rd-arrow l" id="rdPrev" aria-label="Previous page">‹</button>
           <iframe id="rdFrame" sandbox="allow-same-origin" scrolling="no" title="Book page"></iframe>
+          <div class="rd-zone l" data-zone="-1" aria-hidden="true"></div>
+          <div class="rd-zone r" data-zone="1" aria-hidden="true"></div>
           <button class="rd-arrow r" id="rdNext" aria-label="Next page">›</button>
         </div>
         <div class="rd-foot">
@@ -2855,6 +2867,21 @@ body{will-change:transform;transition:transform .22s ease}`;
   $('#rdFont').value=prefs.font; $('#rdFont').onchange=e=>setPref('font',e.target.value);
   $('#rdTheme').value=prefs.theme; $('#rdTheme').onchange=e=>setPref('theme',e.target.value);
   $('#rdFull').onclick=toggleRead;
+  // tap / swipe areas (touch screens): tap left = previous, tap right = next, swipe either way
+  $$('.rd-zone').forEach(z=>{
+    let sx=0, sy=0, st=0, down=false;
+    z.addEventListener('pointerdown',e=>{down=true; sx=e.clientX; sy=e.clientY; st=Date.now(); try{z.setPointerCapture(e.pointerId)}catch(_){}; e.preventDefault()});
+    z.addEventListener('pointerup',e=>{
+      if(!down) return; down=false; e.preventDefault();
+      const dx=e.clientX-sx, dy=e.clientY-sy;
+      if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)) (dx<0?next():prev());           // swipe
+      else if(Math.abs(dx)<15&&Math.abs(dy)<15&&Date.now()-st<600) (+z.dataset.zone>0?next():prev());   // tap
+      else return;
+      z.classList.add('flash'); setTimeout(()=>z.classList.remove('flash'),180); showUI();
+    });
+    z.addEventListener('pointercancel',()=>{down=false});
+    z.addEventListener('click',e=>e.preventDefault());
+  });
   document.addEventListener('keydown',onKey);
   // keep the shared shelf fresh on every device: check GitHub every 2 minutes and whenever you come back to the tab
   let lastSync=Date.now();
